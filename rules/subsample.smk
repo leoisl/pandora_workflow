@@ -41,11 +41,11 @@ rule subsample_PE_illumina:
     resources:
         mem_mb=lambda wildcards, attempt: 1000 * attempt
     log:
-        "logs/subsample/illumina.{sample}.{coverage}x.log"
+        "logs/subsample_PE_illumina/illumina.{sample}.{coverage}x.log"
     shell:
         """
         bash scripts/downsample_reads.sh \
-            illumina \
+            illumina_PE \
             {input.reads_1} \
             {input.reads_2} \
             {input.ref} \
@@ -68,3 +68,28 @@ rule concat_both_subsampled_PE_illumina_reads:
         "logs/concat_both_subsampled_PE_illumina_reads/illumina.{sample}.{coverage}x.log"
     shell:
         "cat {input.subsampled_reads_1} {input.subsampled_reads_2} > {output.subsampled_reads}"
+
+
+rule subsample_SE_illumina:
+    input:
+        reads="data/{sample}/{sample}.illumina.fastq.gz",
+        ref="data/{sample}/{sample}.ref.fa",
+    output:
+        subsampled_reads = "data/{sample}/{sample}.{coverage}x.random.illumina.fastq",
+    threads: 1
+    resources:
+        mem_mb=lambda wildcards, attempt: 1000 * attempt
+    log:
+        "logs/subsample_SE_illumina/illumina.{sample}.{coverage}x.log"
+    shell:
+        """
+        bash scripts/downsample_reads.sh \
+            illumina_SE \
+            {input.reads} \
+            {input.ref} \
+            {wildcards.coverage} \
+            {output.subsampled_reads} 
+        """
+
+# try to subsample paired before of single
+ruleorder: subsample_PE_illumina > concat_both_subsampled_PE_illumina_reads > subsample_SE_illumina
