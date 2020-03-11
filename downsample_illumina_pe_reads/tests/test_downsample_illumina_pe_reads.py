@@ -1,4 +1,4 @@
-from downsample_illumina_reads.downsample_illumina_pe_reads import DownsampleIlluminaPEReads
+from downsample_illumina_pe_reads.downsample_illumina_pe_reads import DownsampleIlluminaPEReads
 from unittest.mock import Mock, patch, call
 from unittest import TestCase
 
@@ -18,31 +18,6 @@ class TestStringMethods(TestCase):
         self.out_reads1_file = Mock(write=self.out_reads1_file_write_mock)
         self.out_reads2_file_write_mock = Mock()
         self.out_reads2_file = Mock(write=self.out_reads2_file_write_mock)
-
-
-    def test____get_read_id_to_number_of_bases___empty_reads___returns_empty_list(self):
-        actual = self.dummy_downsampler._get_read_id_to_number_of_bases_core([])
-        expected = []
-
-        self.assertListEqual(actual, expected)
-
-    def test____get_read_id_to_number_of_bases___one_read(self):
-        actual = self.dummy_downsampler._get_read_id_to_number_of_bases_core(
-            [self.record_mock_of_sequence_with_size_2]
-        )
-        expected = [2]
-
-        self.assertListEqual(actual, expected)
-
-    def test____get_read_id_to_number_of_bases___three_reads(self):
-        actual = self.dummy_downsampler._get_read_id_to_number_of_bases_core(
-            [self.record_mock_of_sequence_with_size_6,
-             self.record_mock_of_sequence_with_size_5,
-             self.record_mock_of_sequence_with_size_4])
-        expected = [6, 5, 4]
-
-        self.assertListEqual(actual, expected)
-
 
     def test___get_read_pair_id_to_number_of_bases_core___empty_reads___returns_empty_list(self):
         actual = self.dummy_downsampler._get_read_pair_id_to_number_of_bases_core([], [])
@@ -98,7 +73,7 @@ class TestStringMethods(TestCase):
         shuffle_list_mock_return = Mock()
         shuffle_list_mock.return_value = shuffle_list_mock_return
 
-        actual = self.dummy_downsampler._get_list_with_random_order_of_read_ids(5)
+        actual = self.dummy_downsampler._get_list_with_random_order_of_read_pair_ids(5)
 
         shuffle_list_mock.assert_called_once_with([0,1,2,3,4])
         self.assertEqual(shuffle_list_mock_return, actual)
@@ -197,7 +172,7 @@ class TestStringMethods(TestCase):
         self.out_reads2_file_write_mock.has_calls(call("read_3\n"), call("read_4\n"), any_order=False)
 
     @patch.object(DownsampleIlluminaPEReads, DownsampleIlluminaPEReads._get_read_pair_id_to_number_of_bases.__name__, return_value=[1,2,3])
-    @patch.object(DownsampleIlluminaPEReads, DownsampleIlluminaPEReads._get_list_with_random_order_of_read_ids.__name__)
+    @patch.object(DownsampleIlluminaPEReads, DownsampleIlluminaPEReads._get_list_with_random_order_of_read_pair_ids.__name__)
     @patch.object(DownsampleIlluminaPEReads, DownsampleIlluminaPEReads._get_reads_until_bases_are_saturated.__name__)
     @patch.object(DownsampleIlluminaPEReads, DownsampleIlluminaPEReads._output_reads.__name__)
     def test___downsample_illumina_pe_reads(self, output_reads_mock, get_reads_until_bases_are_saturated_mock,

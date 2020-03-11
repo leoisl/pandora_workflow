@@ -10,7 +10,6 @@ class DownsampleIlluminaPEReads:
         self._number_of_bases = number_of_bases
         self._out_reads1 = out_reads1
         self._out_reads2 = out_reads2
-
     @property
     def reads1(self):
         return self._reads1
@@ -29,38 +28,31 @@ class DownsampleIlluminaPEReads:
 
     def _get_read_pair_id_to_number_of_bases(self):
         with pysam.FastxFile(self.reads1) as reads1_fastx_file, pysam.FastxFile(self.reads2) as reads2_fastx_file:
-            self._get_read_pair_id_to_number_of_bases_core(reads1_fastx_file, reads2_fastx_file)
+            return self._get_read_pair_id_to_number_of_bases_core(reads1_fastx_file, reads2_fastx_file)
 
-    def _get_read_pair_id_to_number_of_bases_core(self, reads1_fastx_file, reads2_fastx_file):
-        left_read_id_to_number_of_bases = self._get_read_id_to_number_of_bases_core(reads1_fastx_file)
-        right_read_id_to_number_of_bases = self._get_read_id_to_number_of_bases_core(reads2_fastx_file)
-        read_pair_id_to_number_of_bases = [left_bases + right_bases for left_bases, right_bases in
-                                           zip(left_read_id_to_number_of_bases, right_read_id_to_number_of_bases)]
+    def _get_read_pair_id_to_number_of_bases_core(self, reads1_iterator, reads2_iterator):
+        read_pair_id_to_number_of_bases = []
+        for record1, record2 in zip(reads1_iterator, reads2_iterator):
+            number_of_bases = len(record1.sequence) + len(record2.sequence)
+            read_pair_id_to_number_of_bases.append(number_of_bases)
         return read_pair_id_to_number_of_bases
-
-    def _get_read_id_to_number_of_bases_core (self, reads_iterator):
-        read_id_to_number_of_bases = []
-        for record in reads_iterator:
-            number_of_bases = len(record.sequence)
-            read_id_to_number_of_bases.append(number_of_bases)
-        return read_id_to_number_of_bases
 
     def _shuffle_list(self, list):
         random.shuffle(list)
         return list
 
-    def _get_list_with_random_order_of_read_ids(self, number_of_reads):
+    def _get_list_with_random_order_of_read_pair_ids(self, number_of_reads):
         list_with_random_order_of_read_pair_ids = list(range(number_of_reads))
         return self._shuffle_list(list_with_random_order_of_read_pair_ids)
 
-    def _get_reads_until_bases_are_saturated(self, read_id_to_number_of_bases, random_order_of_reads):
+    def _get_reads_until_bases_are_saturated(self, read_pair_id_to_number_of_bases, random_order_of_reads):
         read_pair_ids_to_output = set()
         number_of_bases_output = 0
 
         for read_index in random_order_of_reads:
             if number_of_bases_output >= self.number_of_bases:
                 break
-            number_of_bases_in_read = read_id_to_number_of_bases[read_index]
+            number_of_bases_in_read = read_pair_id_to_number_of_bases[read_index]
             number_of_bases_output += number_of_bases_in_read
             read_pair_ids_to_output.add(read_index)
 
@@ -85,7 +77,7 @@ class DownsampleIlluminaPEReads:
         read_pair_id_to_number_of_bases = self._get_read_pair_id_to_number_of_bases()
 
         number_of_reads = len(read_pair_id_to_number_of_bases)
-        random_order_of_reads = self._get_list_with_random_order_of_read_ids(number_of_reads)
+        random_order_of_reads = self._get_list_with_random_order_of_read_pair_ids(number_of_reads)
 
         read_pair_ids_to_output = self._get_reads_until_bases_are_saturated(read_pair_id_to_number_of_bases, random_order_of_reads)
 
