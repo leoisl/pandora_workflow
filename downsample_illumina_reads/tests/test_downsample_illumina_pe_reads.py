@@ -1,8 +1,8 @@
-from downsample_illumina_reads.downsample_illumina_pe_reads import DownsampleIlluminaPEReads
+from downsample_illumina_reads.downsample_illumina_pe_reads import DownsampleIlluminaPEReads, DownsampleIlluminaSEReads
 from unittest.mock import Mock, patch, call
 from unittest import TestCase
 
-class TestStringMethods(TestCase):
+class TestDownsampleIlluminaPEReads(TestCase):
     def setUp(self) -> None:
         self.dummy_downsampler = DownsampleIlluminaPEReads(None, None, None, None, None)
         self.record_mock_of_sequence_with_size_2 = Mock(sequence="AG")
@@ -18,6 +18,14 @@ class TestStringMethods(TestCase):
         self.out_reads1_file = Mock(write=self.out_reads1_file_write_mock)
         self.out_reads2_file_write_mock = Mock()
         self.out_reads2_file = Mock(write=self.out_reads2_file_write_mock)
+
+    def test_____init__(self):
+        downsampler = DownsampleIlluminaPEReads("reads1", "reads2", "number_of_bases", "out_reads1", "out_reads2")
+        self.assertEqual(downsampler.reads1, "reads1")
+        self.assertEqual(downsampler.reads2, "reads2")
+        self.assertEqual(downsampler.number_of_bases, "number_of_bases")
+        self.assertEqual(downsampler.out_reads1, "out_reads1")
+        self.assertEqual(downsampler.out_reads2, "out_reads2")
 
 
     def test____get_read_id_to_number_of_bases___empty_reads___returns_empty_list(self):
@@ -217,3 +225,35 @@ class TestStringMethods(TestCase):
         get_reads_until_bases_are_saturated_mock.assert_called_once_with([1,2,3],
                                                                          get_list_with_random_order_of_read_pair_ids_return_mock)
         output_reads_mock.assert_called_once_with(get_reads_until_bases_are_saturated_return_mock)
+
+
+
+class TestDownsampleIlluminaSEReads(TestCase):
+    def setUp(self) -> None:
+        self.dummy_downsampler = DownsampleIlluminaSEReads(None, None, None)
+        self.reads_fastx_file = ["read_1", "read_2"]
+        self.out_reads_file_write_mock = Mock()
+        self.out_reads_file = Mock(write=self.out_reads_file_write_mock)
+
+    def test_____init__(self):
+        downsampler = DownsampleIlluminaSEReads("reads", "number_of_bases", "out_reads")
+        self.assertEqual(downsampler.reads, "reads")
+        self.assertEqual(downsampler.number_of_bases, "number_of_bases")
+        self.assertEqual(downsampler.out_reads, "out_reads")
+
+    def test___output_reads_core___read_pair_ids_to_output_is_empty___no_reads_are_output(self):
+        read_pair_ids_to_output = []
+        self.dummy_downsampler._output_reads_core(read_pair_ids_to_output, self.reads_fastx_file, self.out_reads_file)
+        self.out_reads_file_write_mock.assert_not_called()
+
+
+    def test___output_reads_core___read_pair_ids_contains_one_read___one_read_is_output(self):
+        read_pair_ids_to_output = [1]
+        self.dummy_downsampler._output_reads_core(read_pair_ids_to_output, self.reads_fastx_file, self.out_reads_file)
+        self.out_reads_file_write_mock.assert_called_once_with("read_2\n")
+
+    def test___output_reads_core___read_pair_ids_contains_two_reads___two_reads_are_output(self):
+        read_pair_ids_to_output = [0, 1]
+        self.dummy_downsampler._output_reads_core(read_pair_ids_to_output, self.reads_fastx_file, self.out_reads_file)
+        self.assertEqual(self.out_reads_file_write_mock.call_count, 2)
+        self.out_reads_file_write_mock.has_calls(call("read_1\n"), call("read_2\n"), any_order=False)

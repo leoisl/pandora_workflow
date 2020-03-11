@@ -112,6 +112,37 @@ class DownsampleIlluminaPEReads(DownsampleIlluminaReads):
             read_pair_id += 1
 
 
+class DownsampleIlluminaSEReads(DownsampleIlluminaReads):
+    def __init__(self, reads, number_of_bases, out_reads):
+        super().__init__(number_of_bases)
+        self._reads = reads
+        self._out_reads = out_reads
+
+    @property
+    def reads(self):
+        return self._reads
+    @property
+    def out_reads(self):
+        return self._out_reads
+
+    def _get_read_id_to_number_of_bases(self):
+        with pysam.FastxFile(self.reads) as reads_fastx_file:
+            return self._get_read_id_to_number_of_bases_core(reads_fastx_file)
+
+    def _output_reads(self, read_ids_to_output):
+        with pysam.FastxFile(self.reads) as reads_fastx_file, open(self.out_reads, "w") as out_reads_file:
+            self._output_reads_core(read_ids_to_output, reads_fastx_file, out_reads_file)
+
+    def _output_reads_core(self, read_ids_to_output, reads_fastx_file, out_reads_file):
+        read_id = 0
+        for record in reads_fastx_file:
+            if read_id in read_ids_to_output:
+                out_reads_file.write(f"{str(record)}\n")
+            read_id += 1
+
+
+
+
 
 # untested functions below
 def get_args():
