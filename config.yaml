@@ -1,5 +1,9 @@
 # data configs
 original_prg: "data/prgs/ecoli_pangenome_PRG_210619.fa"
+sample_data_dir: "data"
+msas_dir: "data/msas"
+prgs_dir: "data/prgs"
+analysis_output_dir: "analysis"
 
 coverages:
   - 30
@@ -31,4 +35,5 @@ pandora_executable: "/hps/nobackup/research/zi/projects/pandora_paper/pandora/pa
 make_prg_dependencies_img: "containers/make_prg_dependencies.simg"
 plot:
   container: "/hps/nobackup2/singularity/mbhall88/nanoplot.v1.26.3.simg"
+
 

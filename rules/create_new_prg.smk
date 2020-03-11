@@ -3,12 +3,12 @@ from pathlib import Path
 
 rule add_denovo_paths:
     input:
-        map_with_discovery_dirs = expand("analysis/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]),
-        msa = "data/msas/{clustering_tool}/{gene}.fa"
+        map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]),
+        msa = msas_dir + "/{clustering_tool}/{gene}.fa"
     output:
-        updated_msa = "analysis/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
-        appended_msa = "analysis/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
-        prg = "analysis/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa"
+        updated_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
+        appended_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
+        prg = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa"
     threads: 2
     shadow: "shallow"
     resources:
@@ -33,7 +33,7 @@ def aggregate_prgs_input(wildcards):
     input_files = []
     for tool, gene in TOOL_MSA_PAIR:
         input_files.append(
-            f"analysis/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs/{tool}/{gene}.prg.fa"
+            f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs/{tool}/{gene}.prg.fa"
         )
 
     return input_files
@@ -43,12 +43,12 @@ rule aggregate_prgs:
     input:
         prgs = aggregate_prgs_input,
     output:
-        "analysis/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
+        analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 500 * attempt
     params:
-        original_prg = "data/prgs/ecoli_pangenome_PRG_210619.fa"
+        original_prg = config["original_prg"]
     run:
         import fileinput
         with open(output[0], "w") as fout, fileinput.input(input.prgs) as fin:

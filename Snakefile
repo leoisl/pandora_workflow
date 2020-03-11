@@ -17,7 +17,12 @@ configfile: "config.yaml"
 # ======================================================
 # Variables
 # ======================================================
-msa_paths = list(Path("data/msas").rglob("*.fa"))
+sample_data_dir = config["sample_data_dir"]
+msas_dir = config["msas_dir"]
+prgs_dir = config["prgs_dir"]
+analysis_output_dir = config["analysis_output_dir"]
+
+msa_paths = list(Path(msas_dir).rglob("*.fa"))
 cluster_name_to_path_map = {p.name.replace(".fa", ""): p for p in msa_paths}
 assert len(msa_paths) == len(cluster_name_to_path_map)
 
@@ -39,8 +44,6 @@ for technology, sample, coverage, strategy in itertools.product(
         f"analysis/{technology}/{coverage}x/{strategy}/prgs/denovo_updated.prg.fa",
         f"analysis/{technology}/{coverage}x/{strategy}/compare_no_denovo/pandora_multisample_genotyped.vcf",
         f"analysis/{technology}/{coverage}x/{strategy}/compare_with_denovo/pandora_multisample_genotyped.vcf",
-        # f"analysis/{coverage}x/plots/{sample}/NanoPlot-report.html",
-        # f"analysis/plots/{sample}/NanoPlot-report.html",
     ])
 
 
@@ -56,7 +59,6 @@ rule all:
 
 rules_dir = Path("rules/")
 include: str(rules_dir / "subsample.smk")
-# include: str(rules_dir / "plot.smk")
 include: str(rules_dir / "index.smk")
 include: str(rules_dir / "map.smk")
 include: str(rules_dir / "create_new_prg.smk")

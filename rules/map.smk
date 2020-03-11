@@ -2,10 +2,10 @@ rule map_with_discovery:
     input:
         prg=config["original_prg"],
         index=rules.index_original_prg.output.index,
-        reads="data/{sample}/{sample}.{coverage}x.{sub_strategy}.{technology}.fastq",
-        ref="data/{sample}/{sample}.ref.fa",
+        reads=sample_data_dir+"/{sample}/{sample}.{coverage}x.{sub_strategy}.{technology}.fastq",
+        ref=sample_data_dir+"/{sample}/{sample}.ref.fa",
     output:
-        outdir=directory("analysis/{technology}/{coverage}x/{sub_strategy}/{sample}/map_with_discovery")
+        outdir=directory(analysis_output_dir + "/{technology}/{coverage}x/{sub_strategy}/{sample}/map_with_discovery")
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000,

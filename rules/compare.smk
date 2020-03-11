@@ -3,10 +3,10 @@ from rules.utils import get_technology_param
 
 rule create_tsv_for_reads:
     input:
-        expand("data/{sample}/{sample}.{{coverage}}x.{{sub_strategy}}.{{technology}}.fastq",
+        expand(sample_data_dir + "/{sample}/{sample}.{{coverage}}x.{{sub_strategy}}.{{technology}}.fastq",
                sample=config["samples"])
     output:
-        tsv="data/samples.{coverage}x.{sub_strategy}.{technology}.tsv"
+        tsv = sample_data_dir + "/samples.{coverage}x.{sub_strategy}.{technology}.tsv"
     threads: 1
     resources:
         mem_mb=200
@@ -25,11 +25,11 @@ rule create_tsv_for_reads:
 rule compare_with_denovo:
     input:
         read_index=rules.create_tsv_for_reads.output.tsv,
-        prg="analysis/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
+        prg=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
         prg_index=rules.index_prg_updated_with_denovo_paths.output.index,
     output:
-        vcf="analysis/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo/pandora_multisample_genotyped.vcf",
-        vcf_ref="analysis/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo/pandora_multisample.vcf_ref.fa",
+        vcf=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo/pandora_multisample_genotyped.vcf",
+        vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo/pandora_multisample.vcf_ref.fa",
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000
@@ -58,8 +58,8 @@ rule compare_no_denovo:
         prg=config["original_prg"],
         prg_index=rules.index_original_prg.output.index,
     output:
-        vcf="analysis/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo/pandora_multisample_genotyped.vcf",
-        vcf_ref="analysis/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo/pandora_multisample.vcf_ref.fa",
+        vcf=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo/pandora_multisample_genotyped.vcf",
+        vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo/pandora_multisample.vcf_ref.fa",
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000

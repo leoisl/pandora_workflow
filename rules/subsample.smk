@@ -1,9 +1,9 @@
 rule subsample_nanopore:
     input:
-        reads="data/{sample}/{sample}.nanopore.fastq.gz",
-        ref="data/{sample}/{sample}.ref.fa",
+        reads=sample_data_dir+"/{sample}/{sample}.nanopore.fastq.gz",
+        ref=sample_data_dir+"/{sample}/{sample}.ref.fa",
     output:
-        subsampled_reads = "data/{sample}/{sample}.{coverage}x.{sub_strategy}.nanopore.fastq"
+        subsampled_reads = sample_data_dir+"/{sample}/{sample}.{coverage}x.{sub_strategy}.nanopore.fastq"
     params:
         mean_q_weight=config['subsample']['mean_q_weight'],
         min_length=config['subsample']['min_length'],
@@ -31,12 +31,12 @@ rule subsample_nanopore:
 
 rule subsample_PE_illumina:
     input:
-        reads_1="data/{sample}/{sample}.illumina_1.fastq.gz",
-        reads_2="data/{sample}/{sample}.illumina_2.fastq.gz",
-        ref="data/{sample}/{sample}.ref.fa",
+        reads_1=sample_data_dir+"/{sample}/{sample}.illumina_1.fastq.gz",
+        reads_2=sample_data_dir+"/{sample}/{sample}.illumina_2.fastq.gz",
+        ref=sample_data_dir+"/{sample}/{sample}.ref.fa",
     output:
-        subsampled_reads_1 = "data/{sample}/{sample}.{coverage}x.random.illumina.1.fastq",
-        subsampled_reads_2 = "data/{sample}/{sample}.{coverage}x.random.illumina.2.fastq"
+        subsampled_reads_1 = sample_data_dir+"/{sample}/{sample}.{coverage}x.random.illumina.1.fastq",
+        subsampled_reads_2 = sample_data_dir+"/{sample}/{sample}.{coverage}x.random.illumina.2.fastq"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: 1000 * attempt
@@ -60,7 +60,7 @@ rule concat_both_subsampled_PE_illumina_reads:
          subsampled_reads_1 = rules.subsample_PE_illumina.output.subsampled_reads_1,
          subsampled_reads_2 = rules.subsample_PE_illumina.output.subsampled_reads_2
     output:
-         subsampled_reads = "data/{sample}/{sample}.{coverage}x.random.illumina.fastq"
+         subsampled_reads = sample_data_dir+"/{sample}/{sample}.{coverage}x.random.illumina.fastq"
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: 1000 * attempt
@@ -72,10 +72,10 @@ rule concat_both_subsampled_PE_illumina_reads:
 
 rule subsample_SE_illumina:
     input:
-        reads="data/{sample}/{sample}.illumina.fastq.gz",
-        ref="data/{sample}/{sample}.ref.fa",
+        reads=sample_data_dir+"/{sample}/{sample}.illumina.fastq.gz",
+        ref=sample_data_dir+"/{sample}/{sample}.ref.fa",
     output:
-        subsampled_reads = "data/{sample}/{sample}.{coverage}x.random.illumina.fastq",
+        subsampled_reads = sample_data_dir+"/{sample}/{sample}.{coverage}x.random.illumina.fastq",
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: 1000 * attempt
