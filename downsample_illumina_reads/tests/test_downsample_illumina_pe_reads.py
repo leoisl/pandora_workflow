@@ -200,7 +200,7 @@ class TestStringMethods(TestCase):
     @patch.object(DownsampleIlluminaPEReads, DownsampleIlluminaPEReads._get_list_with_random_order_of_read_ids.__name__)
     @patch.object(DownsampleIlluminaPEReads, DownsampleIlluminaPEReads._get_reads_until_bases_are_saturated.__name__)
     @patch.object(DownsampleIlluminaPEReads, DownsampleIlluminaPEReads._output_reads.__name__)
-    def test___downsample_illumina_pe_reads(self, output_reads_mock, get_reads_until_bases_are_saturated_mock,
+    def test___downsample_illumina_reads(self, output_reads_mock, get_reads_until_bases_are_saturated_mock,
                                             get_list_with_random_order_of_read_pair_ids_mock,
                                             get_read_pair_id_to_number_of_bases_mock):
         get_list_with_random_order_of_read_pair_ids_return_mock = Mock()
@@ -210,7 +210,7 @@ class TestStringMethods(TestCase):
         get_reads_until_bases_are_saturated_mock.return_value = get_reads_until_bases_are_saturated_return_mock
 
 
-        self.dummy_downsampler.downsample_illumina_pe_reads()
+        self.dummy_downsampler.downsample_illumina_reads()
 
         get_read_pair_id_to_number_of_bases_mock.assert_called_once_with()
         get_list_with_random_order_of_read_pair_ids_mock.assert_called_once_with(3)
