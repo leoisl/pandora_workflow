@@ -4,6 +4,7 @@ sample_data_dir: "data"
 msas_dir: "data/msas"
 prgs_dir: "data/prgs"
 analysis_output_dir: "analysis"
+msas_csv: "data/msas/msas.csv"
 
 coverages:
   - 30

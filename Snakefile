@@ -1,6 +1,7 @@
 from pathlib import Path
 import itertools
 from snakemake.utils import min_version, validate
+import pandas as pd
 
 min_version("5.4.0")
 
@@ -21,8 +22,10 @@ sample_data_dir = config["sample_data_dir"]
 msas_dir = config["msas_dir"]
 prgs_dir = config["prgs_dir"]
 analysis_output_dir = config["analysis_output_dir"]
+msas_csv = config["msas_csv"]
 
-msa_paths = list(Path(msas_dir).rglob("*.fa"))
+msa_paths_as_str = pd.read_csv(msas_csv)["msas_absolute_paths"]
+msa_paths = [Path(msa_path_as_str) for msa_path_as_str in msa_paths_as_str]
 cluster_name_to_path_map = {p.name.replace(".fa", ""): p for p in msa_paths}
 assert len(msa_paths) == len(cluster_name_to_path_map)
 
