@@ -1,6 +1,7 @@
 from pathlib import Path
 from rules.utils import get_technology_param
 
+
 rule index_prg_updated_with_denovo_paths:
     input:
         analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
@@ -16,7 +17,6 @@ rule index_prg_updated_with_denovo_paths:
         "logs/index_prg_updated_with_denovo_paths/{technology}/{coverage}x/{sub_strategy}.log"
     shell:
         "{params.pandora} index -t {threads} {input} > {log} 2>&1"
-
 
 
 rule create_tsv_for_reads:
@@ -38,6 +38,7 @@ rule create_tsv_for_reads:
             echo -e \"$sample_name\t$(realpath $path)\" >> {output.tsv} 2>> {log}
         done
         """
+
 
 rule compare_with_denovo:
     input:
@@ -68,6 +69,7 @@ rule compare_with_denovo:
             {params.technology_param} \
             --log_level {params.log_level} > {log} 2>&1
         """
+
 
 rule compare_no_denovo:
     input:

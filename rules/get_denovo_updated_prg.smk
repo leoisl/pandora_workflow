@@ -41,7 +41,6 @@ def aggregate_prgs_with_denovo_path_input(wildcards):
     return input_files
 
 
-
 def is_header(line):
     return line.startswith(">")
 
@@ -124,14 +123,13 @@ def concatenate_several_prgs_into_one(input_prgs, output_prg):
                 prg_sequence = get_PRG_sequence(line)
                 fout.write(prg_sequence + "\n")
 
+
 rule aggregate_prgs_with_denovo_path:
     input:
         map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]),
         prgs = aggregate_prgs_with_denovo_path_input,
-
     output:
         prgs_with_denovo_paths = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prgs_with_denovo_paths.fa",
-
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
