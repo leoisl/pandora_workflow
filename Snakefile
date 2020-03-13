@@ -1,7 +1,6 @@
 from pathlib import Path
 import itertools
-from snakemake.utils import min_version, validate
-import pandas as pd
+from snakemake.utils import min_version
 
 min_version("5.4.0")
 
@@ -23,18 +22,8 @@ msas_dir = config["msas_dir"]
 prgs_dir = config["prgs_dir"]
 analysis_output_dir = config["analysis_output_dir"]
 msas_csv = config["msas_csv"]
+samples = config["samples"]
 
-msa_paths_as_str = pd.read_csv(msas_csv)["msas_absolute_paths"]
-msa_paths = [Path(msa_path_as_str) for msa_path_as_str in msa_paths_as_str]
-cluster_name_to_path_map = {p.name.replace(".fa", ""): p for p in msa_paths}
-assert len(msa_paths) == len(cluster_name_to_path_map)
-
-TOOL_MSA_PAIR = []
-for gene_name in cluster_name_to_path_map:
-    if gene_name.startswith("GC"):
-        TOOL_MSA_PAIR.append(("panx", gene_name))
-    elif gene_name.startswith("Clus"):
-        TOOL_MSA_PAIR.append(("piggy", gene_name))
 
 output_files = []
 for technology, sample, coverage, strategy in itertools.product(
