@@ -50,13 +50,13 @@ rule all:
          output_files
 
 subworkflow map_with_discovery:
-    snakefile: "Snakefile_map_with_denovo",
+    snakefile: "Snakefile_map_with_denovo"
     configfile: "config.yaml"
 
 subworkflow get_denovo_updated_prg:
-    snakefile: "Snakefile_get_denovo_updated_prg",
+    snakefile: "Snakefile_get_denovo_updated_prg"
     configfile: "config.yaml"
 
 subworkflow compare:
-    snakefile: "Snakefile_compare",
+    snakefile: "Snakefile_compare"
     configfile: "config.yaml"
