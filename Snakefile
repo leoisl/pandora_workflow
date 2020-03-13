@@ -51,10 +51,6 @@ subworkflow get_denovo_updated_prg:
     snakefile: "Snakefile_get_denovo_updated_prg"
     configfile: "config.yaml"
 
-subworkflow compare:
-    snakefile: "Snakefile_compare"
-    configfile: "config.yaml"
-
 
 # ======================================================
 # Rules
@@ -62,3 +58,5 @@ subworkflow compare:
 rule all:
     input:
          output_files
+
+include: "rules/compare.smk"
