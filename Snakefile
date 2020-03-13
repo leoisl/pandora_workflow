@@ -42,13 +42,7 @@ for technology, sample, coverage, strategy in itertools.product(
 # deduplicate
 output_files = list(set(output_files))
 
-# ======================================================
-# Rules
-# ======================================================
-rule all:
-    input:
-         output_files
-
+# subworkflows
 subworkflow map_with_discovery:
     snakefile: "Snakefile_map_with_denovo"
     configfile: "config.yaml"
@@ -60,3 +54,11 @@ subworkflow get_denovo_updated_prg:
 subworkflow compare:
     snakefile: "Snakefile_compare"
     configfile: "config.yaml"
+
+
+# ======================================================
+# Rules
+# ======================================================
+rule all:
+    input:
+         output_files
