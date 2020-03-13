@@ -21,8 +21,8 @@ rule index_prg_updated_with_denovo_paths:
 
 rule create_tsv_for_reads:
     input:
-        [map_with_denovo(file for file in
-         expand(sample_data_dir + "/{sample}/{sample}.{{coverage}}x.{{sub_strategy}}.{{technology}}.fastq", sample=config["samples"]))]
+        [map_with_denovo(file) for file in
+         expand(sample_data_dir + "/{sample}/{sample}.{{coverage}}x.{{sub_strategy}}.{{technology}}.fastq", sample=config["samples"])]
     output:
         tsv = sample_data_dir + "/samples.{coverage}x.{sub_strategy}.{technology}.tsv"
     threads: 1
