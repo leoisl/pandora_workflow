@@ -1,4 +1,97 @@
 from pathlib import Path
+import pandas as pd
+import fileinput
+
+
+def get_genes_with_denovo_paths(analysis_output_dir, technology, coverage, sub_strategy, samples):
+    denovo_dirs = [f"{analysis_output_dir}/{technology}/{coverage}x/{sub_strategy}/{sample}/map_with_discovery" for sample in samples]
+    denovo_dirs = [Path(denovo_dir) for denovo_dir in denovo_dirs]
+    genes = set()
+    for denovo_dir in denovo_dirs:
+        for file in denovo_dir.glob("*.fa"):
+            gene = file.name.split(".")[0]
+            genes.add(gene)
+    return genes
+
+
+def get_genes_without_denovo_paths(genes_with_denovo_paths, msas_csv):
+    msa_paths_as_str = pd.read_csv(msas_csv)["msas_absolute_paths"]
+    msa_paths = [Path(msa_path_as_str) for msa_path_as_str in msa_paths_as_str]
+    all_genes = {p.name.replace(".fa", "") for p in msa_paths}
+    assert len(msa_paths) == len(all_genes)
+    genes_without_denovo_paths = all_genes - genes_with_denovo_paths
+    return genes_without_denovo_paths
+
+
+def aggregate_prgs_input(wildcards, genes):
+    input_files = []
+    for gene in genes:
+        if gene.startswith("GC"):
+            tool = "panx"
+        elif gene.startswith("Clus"):
+            tool = "piggy"
+        else:
+            assert False, "Gene does not start with GC nor Clus"
+
+        input_files.append(
+            f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs/{tool}/{gene}.prg.fa"
+        )
+    return input_files
+
+
+def aggregate_prgs_without_denovo_path_input(wildcards):
+    genes_with_denovo_paths = get_genes_with_denovo_paths(analysis_output_dir, wildcards.technology, wildcards.coverage,
+                                                          wildcards.sub_strategy, samples)
+    genes_without_denovo_paths = get_genes_without_denovo_paths(genes_with_denovo_paths, msas_csv)
+    return aggregate_prgs_input(wildcards, genes_without_denovo_paths)
+
+
+def aggregate_prgs_with_denovo_path_input(wildcards):
+    genes_with_denovo_paths = get_genes_with_denovo_paths(analysis_output_dir, wildcards.technology, wildcards.coverage,
+                                                          wildcards.sub_strategy, samples)
+    return aggregate_prgs_input(wildcards, genes_with_denovo_paths)
+
+
+def is_header(line):
+    return line.startswith(">")
+
+
+def get_gene(line):
+    stripped_line = line.rstrip()
+    gene = stripped_line[1:]
+    return gene
+
+
+def get_PRG_sequence(line):
+    prg_sequence = line.rstrip()
+    line_ends_digit = prg_sequence[-1].isdigit()
+    if line_ends_digit:
+        prg_sequence += " "
+    return prg_sequence
+
+
+rule aggregate_prgs_without_denovo_path:
+    input:
+        prgs = aggregate_prgs_without_denovo_path_input
+    output:
+        prgs_without_denovo_paths = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prgs_without_denovo_paths.fa",
+    threads: 1
+    resources:
+        mem_mb = lambda wildcards, attempt: 2000 * attempt
+    params:
+        original_prg = config["original_prg"]
+    log:
+        "logs/aggregate_prgs_without_denovo_path/{technology}/{coverage}x/{sub_strategy}/.log"
+    run:
+        with open(params.original_prg) as original_prg, open(output.prgs_without_denovo_paths, "w") as prgs_without_denovo_paths:
+            for line in original_prg:
+                if is_header(line):
+                    gene = get_gene(line)
+                else:
+                    if gene in input.prgs:
+                        prg_sequence = get_PRG_sequence(line)
+                        prgs_without_denovo_paths.write(">" + gene + "\n")
+                        prgs_without_denovo_paths.write(prg_sequence + "\n")
 
 
 rule add_denovo_paths:
@@ -12,7 +105,7 @@ rule add_denovo_paths:
     threads: 8
     shadow: "shallow"
     resources:
-        mem_mb = lambda wildcards, attempt: {1: 1000, 2: 4000, 3: 16000}.get(attempt, 64000)
+        mem_mb = lambda wildcards, attempt: {1: 8000, 2: 16000, 3: 32000}.get(attempt, 64000)
     params:
         log_level = "DEBUG",
         make_prg_script = "scripts/make_prg_from_msa.py",
@@ -28,38 +121,46 @@ rule add_denovo_paths:
         "../scripts/add_denovo_paths.py"
 
 
+def concatenate_several_prgs_into_one(input_prgs, output_prg):
+    with open(output_prg, "w") as fout, fileinput.input(input_prgs) as fin:
+        for line in fin:
+            if is_header(line):
+                fout.write(line)
+            else:
+                prg_sequence = get_PRG_sequence(line)
+                fout.write(prg_sequence + "\n")
 
-def aggregate_prgs_input(wildcards):
-    input_files = []
-    for tool, gene in TOOL_MSA_PAIR:
-        input_files.append(
-            f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs/{tool}/{gene}.prg.fa"
-        )
+rule aggregate_prgs_with_denovo_path:
+    input:
+        prgs = aggregate_prgs_with_denovo_path_input
+    output:
+        prgs_with_denovo_paths = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prgs_with_denovo_paths.fa",
 
-    return input_files
+    threads: 1
+    resources:
+        mem_mb = lambda wildcards, attempt: 2000 * attempt
+    log:
+        "logs/aggregate_prgs_with_denovo_path/{technology}/{coverage}x/{sub_strategy}/.log"
+    run:
+        concatenate_several_prgs_into_one(input.prgs, output.prgs_with_denovo_paths)
 
 
 rule aggregate_prgs:
     input:
-        prgs = aggregate_prgs_input,
+        prgs_with_denovo_paths = rules.aggregate_prgs_with_denovo_path.output.prgs_with_denovo_paths,
+        prgs_without_denovo_paths = rules.aggregate_prgs_without_denovo_path.output.prgs_without_denovo_paths
     output:
-        analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
+        prg = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
     threads: 1
     resources:
-        mem_mb = lambda wildcards, attempt: 500 * attempt
+        mem_mb = lambda wildcards, attempt: 2000 * attempt
+    log:
+        "logs/aggregate_prgs/{technology}/{coverage}x/{sub_strategy}/.log"
     params:
         original_prg = config["original_prg"]
     run:
-        import fileinput
-        with open(output[0], "w") as fout, fileinput.input(input.prgs) as fin:
-            for line in fin:
-                is_header = line.startswith(">")
-                # strip and add newline in case some lines are missing newline
-                stripped_line = line.rstrip()
-                line_ends_digit = stripped_line[-1].isdigit()
-                if (not is_header) and line_ends_digit:
-                    stripped_line += " "
-                fout.write(stripped_line + "\n")
+        concatenate_several_prgs_into_one([input.prgs_with_denovo_paths, input.prgs_without_denovo_paths],
+                                          output.prg)
 
         # check original prg and new prg have the same number of sequences
         prgs_in_original = 0
@@ -69,7 +170,7 @@ rule aggregate_prgs:
                     prgs_in_original += 1
 
         prgs_in_new = 0
-        with open(output[0]) as fh:
+        with open(output.prg) as fh:
             for line in fh:
                 if line.startswith(">"):
                     prgs_in_new += 1
