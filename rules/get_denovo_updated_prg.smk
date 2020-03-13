@@ -62,7 +62,7 @@ def get_PRG_sequence(line):
 
 rule aggregate_prgs_without_denovo_path:
     input:
-        map_with_discovery_dirs = map_with_denovo(expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]))
+        map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"])
     output:
         prgs_without_denovo_paths = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prgs_without_denovo_paths.fa",
     threads: 1
@@ -90,7 +90,7 @@ rule aggregate_prgs_without_denovo_path:
 
 rule add_denovo_paths:
     input:
-        map_with_discovery_dirs = map_with_denovo(expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"])),
+        map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]),
         msa = msas_dir + "/{clustering_tool}/{gene}.fa"
     output:
         updated_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
@@ -126,7 +126,7 @@ def concatenate_several_prgs_into_one(input_prgs, output_prg):
 
 rule aggregate_prgs_with_denovo_path:
     input:
-        map_with_discovery_dirs = map_with_denovo(expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"])),
+        map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]),
         prgs = aggregate_prgs_with_denovo_path_input,
 
     output:
