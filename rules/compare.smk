@@ -75,7 +75,7 @@ rule compare_no_denovo:
     input:
         read_index=rules.create_tsv_for_reads.output.tsv,
         prg=config["original_prg"],
-        prg_index=rules.index_original_prg.output.index,
+        prg_index=config["original_prg"] + ".k15.w14.idx",
     output:
         vcf=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo/pandora_multisample_genotyped.vcf",
         vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo/pandora_multisample.vcf_ref.fa",
