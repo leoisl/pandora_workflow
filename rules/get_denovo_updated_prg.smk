@@ -4,7 +4,7 @@ import fileinput
 
 
 def get_genes_with_denovo_paths(analysis_output_dir, technology, coverage, sub_strategy, samples):
-    denovo_dirs = [f"{analysis_output_dir}/{technology}/{coverage}x/{sub_strategy}/{sample}/map_with_discovery" for sample in samples]
+    denovo_dirs = [f"{analysis_output_dir}/{technology}/{coverage}x/{sub_strategy}/{sample}/map_with_discovery/denovo_paths" for sample in samples]
     denovo_dirs = [Path(denovo_dir) for denovo_dir in denovo_dirs]
     genes = set()
     for denovo_dir in denovo_dirs:
