@@ -1,6 +1,6 @@
 import argparse
 import pysam
-from downsample_illumina_reads.downsample_illumina_reads import DownsampleIlluminaReads
+from .downsample_illumina_reads import DownsampleIlluminaReads
 
 
 class DownsampleIlluminaPEReads(DownsampleIlluminaReads):
