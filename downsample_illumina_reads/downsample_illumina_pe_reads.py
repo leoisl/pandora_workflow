@@ -1,6 +1,9 @@
 import argparse
 import pysam
-from downsample_illumina_reads.downsample_illumina_reads import DownsampleIlluminaReads
+if __name__ == "__main__":
+    from downsample_illumina_reads import DownsampleIlluminaReads  # import relative to this dir
+else:
+    from downsample_illumina_reads.downsample_illumina_reads import DownsampleIlluminaReads  # import relative to root
 
 
 class DownsampleIlluminaPEReads(DownsampleIlluminaReads):
@@ -57,11 +60,11 @@ class DownsampleIlluminaPEReads(DownsampleIlluminaReads):
 # untested functions below
 def get_args():
     parser = argparse.ArgumentParser(description='Downsample illumina paired-end reads.')
-    parser.add_argument('--reads1')
-    parser.add_argument('--reads2')
-    parser.add_argument("--number_of_bases", type=int, help="Number of bases to have in the output files")
-    parser.add_argument('--out_reads1')
-    parser.add_argument('--out_reads2')
+    parser.add_argument('--reads1', required=True)
+    parser.add_argument('--reads2', required=True)
+    parser.add_argument("--number_of_bases", type=int, help="Number of bases to have in the output files", required=True)
+    parser.add_argument('--out_reads1', required=True)
+    parser.add_argument('--out_reads2', required=True)
 
     args = parser.parse_args()
     return args
