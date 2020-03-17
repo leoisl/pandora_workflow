@@ -98,7 +98,7 @@ rule add_denovo_paths:
     threads: 8
     shadow: "shallow"
     resources:
-        mem_mb = lambda wildcards, attempt: {1: 8000, 2: 16000, 3: 32000}.get(attempt, 64000)
+        mem_mb = lambda wildcards, attempt: {1: 8000, 2: 32000, 3: 120000}.get(attempt, 220000)
     params:
         log_level = "DEBUG",
         make_prg_script = "scripts/make_prg_from_msa.py",
