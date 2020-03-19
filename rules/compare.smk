@@ -46,25 +46,25 @@ rule compare_with_denovo:
         prg=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
         prg_index=rules.index_prg_updated_with_denovo_paths.output.index,
     output:
-        vcf=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo/pandora_multisample_genotyped.vcf",
-        vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo/pandora_multisample.vcf_ref.fa",
+        vcf=    analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped.vcf",
+        vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo_{genotyping_mode}_genotyping/pandora_multisample.vcf_ref.fa",
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000
     params:
         pandora=config["pandora_executable"],
-        log_level="debug",
+        log_level="info",
         outdir=lambda wildcards, output: str(Path(output.vcf).parent),
         technology_param = lambda wildcards: get_technology_param(wildcards)
     log:
-        "logs/compare_with_denovo/{technology}/{coverage}x/{sub_strategy}.log"
+        "logs/compare_with_denovo/{technology}/{coverage}x/{sub_strategy}/{genotyping_mode}.log"
     shell:
         """
         {params.pandora} compare --prg_file {input.prg} \
             --read_index {input.read_index} \
             --outdir {params.outdir} \
             -t {threads} \
-            --genotype \
+            --genotype {wildcards.genotyping_mode} \
             --max_covg 100000 \
             {params.technology_param} \
             --log_level {params.log_level} > {log} 2>&1
@@ -77,18 +77,18 @@ rule compare_no_denovo:
         prg=config["original_prg"],
         prg_index=config["original_prg"] + ".k15.w14.idx",
     output:
-        vcf=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo/pandora_multisample_genotyped.vcf",
-        vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo/pandora_multisample.vcf_ref.fa",
+        vcf=    analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped.vcf",
+        vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo_{genotyping_mode}_genotyping/pandora_multisample.vcf_ref.fa",
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000
     params:
         pandora=config["pandora_executable"],
-        log_level="debug",
+        log_level="info",
         outdir=lambda wildcards, output: str(Path(output.vcf).parent),
         technology_param = lambda wildcards: get_technology_param(wildcards)
     log:
-        "logs/compare_no_denovo/{technology}/{coverage}x/{sub_strategy}.log"
+        "logs/compare_no_denovo/{technology}/{coverage}x/{sub_strategy}/{genotyping_mode}.log"
     shell:
         """
         {params.pandora} compare \
@@ -96,7 +96,7 @@ rule compare_no_denovo:
             --read_index {input.read_index} \
             --outdir {params.outdir} \
             -t {threads} \
-            --genotype \
+            --genotype {wildcards.genotyping_mode} \
             --max_covg 100000 \
             {params.technology_param} \
             --log_level {params.log_level} > {log} 2>&1

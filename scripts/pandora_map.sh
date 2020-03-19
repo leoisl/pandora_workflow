@@ -43,7 +43,6 @@ cd "$outdir" || exit 1
     --output_covgs \
     --output_vcf \
     --log_level "$log_level" \
-    --genotype \
     --max_covg 100000 \
     ${technology_param} \
     "$discover" > "$log" 2>&1

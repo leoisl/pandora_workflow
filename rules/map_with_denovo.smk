@@ -124,7 +124,7 @@ rule map_with_discovery:
         mem_mb=lambda wildcards, attempt: attempt * 30000,
     params:
         pandora=config["pandora_executable"],
-        log_level="debug",
+        log_level="info",
         use_discover=True,
     log:
         "logs/map_with_discovery/{technology}/{coverage}x/{sub_strategy}/{sample}.log"
