@@ -32,7 +32,7 @@ class DownsampleIlluminaPEReads(DownsampleIlluminaReads):
 
     def _get_read_pair_id_to_number_of_bases(self):
         with pysam.FastxFile(self.reads1) as reads1_fastx_file, pysam.FastxFile(self.reads2) as reads2_fastx_file:
-            self._get_read_pair_id_to_number_of_bases_core(reads1_fastx_file, reads2_fastx_file)
+            return self._get_read_pair_id_to_number_of_bases_core(reads1_fastx_file, reads2_fastx_file)
 
     def _get_read_pair_id_to_number_of_bases_core(self, reads1_fastx_file, reads2_fastx_file):
         left_read_id_to_number_of_bases = self._get_read_id_to_number_of_bases_core(reads1_fastx_file)
