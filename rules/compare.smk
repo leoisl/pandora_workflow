@@ -46,7 +46,7 @@ rule compare_with_denovo:
         prg=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
         prg_index=rules.index_prg_updated_with_denovo_paths.output.index,
     output:
-        vcf=    analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped.vcf",
+        vcf=    analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped_{genotyping_mode}.vcf",
         vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_with_denovo_{genotyping_mode}_genotyping/pandora_multisample.vcf_ref.fa",
     threads: 16
     resources:
@@ -77,7 +77,7 @@ rule compare_no_denovo:
         prg=config["original_prg"],
         prg_index=config["original_prg"] + ".k15.w14.idx",
     output:
-        vcf=    analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped.vcf",
+        vcf=    analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped_{genotyping_mode}.vcf",
         vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_no_denovo_{genotyping_mode}_genotyping/pandora_multisample.vcf_ref.fa",
     threads: 16
     resources:
