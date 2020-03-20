@@ -32,10 +32,10 @@ for technology, sample, coverage, strategy in itertools.product(
                                                     config["coverages"],
                                                     config["subsample"]["strategies"]):
     output_files.extend([
-        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_no_denovo_local_genotyping/pandora_multisample_genotyped.vcf",
-        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_no_denovo_global_genotyping/pandora_multisample_genotyped.vcf",
-        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_with_denovo_local_genotyping/pandora_multisample_genotyped.vcf",
-        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_with_denovo_global_genotyping/pandora_multisample_genotyped.vcf",
+        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_no_denovo_local_genotyping/pandora_multisample_genotyped_local.vcf",
+        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_no_denovo_global_genotyping/pandora_multisample_genotyped_global.vcf",
+        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_with_denovo_local_genotyping/pandora_multisample_genotyped_local.vcf",
+        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_with_denovo_global_genotyping/pandora_multisample_genotyped_global.vcf",
     ])
 
 
