@@ -222,3 +222,5 @@ Pipfile.lock
 *.simg
 
 external_script/distribution_RAM_make_prg/genes_where_make_prg_took_10_GBs\.zip
+
+external_script/manual_curation_panx/genes_where_make_prg_took_10_GBs/
