@@ -11,7 +11,7 @@ def create_genomes(input_genomes_dir, output_dir):
         genome = file.with_suffix("").name
         genome_dir = output_dir / genome
         genome_dir.mkdir(exist_ok=True)
-        os.symlink(file, genome_dir / f"{genome}.ref.fasta")
+        os.symlink(file, genome_dir / f"{genome}.ref.fa")
 
 def create_illumina_data(input_illumina_dir, output_dir):
     output_dir = Path(output_dir).absolute()
