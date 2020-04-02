@@ -17,5 +17,5 @@ outname_2="$6"
 genome_size=$(grep -v '^>' "$ref" | wc | awk '{print $3-$1}')
 num_bases_to_keep=$((genome_size * covg))
 
-python downsample_illumina_pe_reads/downsample_illumina_pe_reads.py --reads1 $reads_1 --reads2 $reads_2 \
+python downsample_illumina_reads/downsample_illumina_pe_reads.py --reads1 $reads_1 --reads2 $reads_2 \
 --number_of_bases $num_bases_to_keep --out_reads1 $outname_1 --out_reads2 $outname_2

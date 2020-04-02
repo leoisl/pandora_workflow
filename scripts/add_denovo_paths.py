@@ -1,10 +1,7 @@
-import logging
-
-import shutil
-from pathlib import Path
 from snakemake.shell import shell
 from typing import List, TextIO
-
+from pathlib import Path
+import logging
 log_level = snakemake.params.log_level
 logging.basicConfig(
     filename=str(snakemake.log),
@@ -80,12 +77,6 @@ def build_prg_after_adding_denovo_paths(
     prg.write(tmp_prg.read_text() + "\n")
 
 
-def extract_gene_from_original_prg(gene: str, original_prg: str, output: str):
-    logging.info("Extracting gene from original PRG")
-    shell(f"grep -A 1 '>{gene}$' {original_prg} > {output}")
-    logging.info("Extraction complete")
-
-
 def main():
     appended_msa = Path(snakemake.output.appended_msa)
     updated_msa = Path(snakemake.output.updated_msa)
@@ -100,12 +91,7 @@ def main():
     denovo_paths = get_denovo_path_filepaths(denovo_dirs)
 
     if not denovo_paths:
-        logging.info("No denovo paths found.")
-        shutil.copy(old_msa, appended_msa)
-        shutil.copy(appended_msa, updated_msa)
-        extract_gene_from_original_prg(
-            snakemake.wildcards.gene, snakemake.params.original_prg, str(prg)
-        )
+        raise Exception("Error: no denovo paths found.")
     else:
         with appended_msa.open("w") as fh_out:
             append_denovo_paths_to_msa(denovo_paths, fh_out, old_msa)

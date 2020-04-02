@@ -42,6 +42,12 @@ def cli() -> argparse.Namespace:
         type=int,
         choices=range(6),
     )
+    parser.add_argument(
+        "--analysis_output_dir",
+        help="Path to analysis output dir",
+        type=str,
+        required=True
+    )
 
     args = parser.parse_args()
 
@@ -58,14 +64,14 @@ def cli() -> argparse.Namespace:
     return args
 
 
-def generate_denovo_search_pattern(coverage: int) -> str:
+def generate_denovo_search_pattern(coverage: int, analysis_output_dir: str) -> str:
     return (
-        f"analysis/{coverage}x/*/map_with_discovery/denovo_paths/*denovo_discovery.fa"
+        f"{analysis_output_dir}/{coverage}x/*/map_with_discovery/denovo_paths/*denovo_discovery.fa"
     )
 
 
-def get_set_of_denovo_path_gene_names(coverage: int) -> Set[str]:
-    denovo_paths = Path().rglob(generate_denovo_search_pattern(coverage))
+def get_set_of_denovo_path_gene_names(coverage: int, analysis_output_dir: str) -> Set[str]:
+    denovo_paths = Path().rglob(generate_denovo_search_pattern(coverage, analysis_output_dir))
     denovo_genes = set()
     for p in denovo_paths:
         gene = p.name.split(".")[0]
@@ -85,7 +91,7 @@ def load_prg(prg_path: Path) -> Dict[str, str]:
     return prg
 
 
-def generate_output_path_for_gene(gene: str, coverage: int) -> Path:
+def generate_output_path_for_gene(gene: str, coverage: int, analysis_output_dir: str) -> Path:
     if gene.startswith("GC"):
         clustering_tool = "panx"
     elif gene.startswith("Cluster"):
@@ -93,14 +99,14 @@ def generate_output_path_for_gene(gene: str, coverage: int) -> Path:
     else:
         raise ValueError(f"{gene} does not start with a recognised pattern.")
 
-    return Path(f"analysis/{coverage}x/prgs/{clustering_tool}/{gene}.prg.fa")
+    return Path(f"{analysis_output_dir}/{coverage}x/prgs/{clustering_tool}/{gene}.prg.fa")
 
 
 def main():
     args = cli()
 
     logging.info("Getting denovo path gene names.")
-    denovo_genes = get_set_of_denovo_path_gene_names(args.coverage)
+    denovo_genes = get_set_of_denovo_path_gene_names(args.coverage, args.analysis_output_dir)
     logging.info(f"Got {len(denovo_genes)} denovo genes.")
 
     logging.info("Loading PRG file.")
@@ -115,7 +121,7 @@ def main():
     for i, gene in enumerate(genes_not_in_denovo):
         logging.debug(f"Processing {gene}")
         sequence = prg[gene]
-        gene_outpath = generate_output_path_for_gene(gene, args.coverage)
+        gene_outpath = generate_output_path_for_gene(gene, args.coverage, args.analysis_output_dir)
 
         if not gene_outpath.parent.is_dir():
             gene_outpath.parent.mkdir(parents=True, exist_ok=True)
