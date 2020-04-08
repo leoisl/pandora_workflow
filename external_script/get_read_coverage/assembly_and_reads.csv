@@ -1,0 +1,4 @@
+assembly,reads
+genomes/genome1.fasta,reads/reads1_1.fasta
+genomes/genome1.fasta,reads/reads1_2.fasta
+genomes/genome2.fasta,reads/reads2.fasta
