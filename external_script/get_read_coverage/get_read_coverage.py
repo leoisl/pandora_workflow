@@ -24,7 +24,7 @@ def main():
         number_of_bases_in_assembly = get_number_of_bases(assembly)
         number_of_bases_in_read = get_number_of_bases(reads)
         coverage = number_of_bases_in_read / number_of_bases_in_assembly
-        print(f"Coverage of {reads} on {assembly}:")
+        print(f"Coverage of {reads} ({number_of_bases_in_read} bps) on {assembly} ({number_of_bases_in_assembly} bps):")
         print(coverage)
 
 if __name__ == "__main__":
