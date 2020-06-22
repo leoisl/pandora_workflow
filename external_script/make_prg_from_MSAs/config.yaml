@@ -1,0 +1,3 @@
+msas_dir: /home/leandro/git/myforks/pandora_analysis_pipeline/external_script/make_prg_from_MSAs/msas
+output_dir: /home/leandro/git/myforks/pandora_analysis_pipeline/external_script/make_prg_from_MSAs/prgs
+make_prg_dependencies_img: "containers/make_prg_dependencies.simg"
