@@ -45,7 +45,7 @@ rule make_prg:
     log:
         "logs/make_prg/{gene}.log"
     script:
-        "make_prgmake.py"
+        "make_prg.py"
 
 
 def is_header(line):
