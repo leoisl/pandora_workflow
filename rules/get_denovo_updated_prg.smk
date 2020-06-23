@@ -33,7 +33,7 @@ def aggregate_prgs_with_denovo_path_input(wildcards):
         elif gene.startswith("Clus"):
             tool = "piggy"
         else:
-            assert False, "Gene does not start with GC nor Clus"
+            tool = "custom"
 
         input_files.append(
             f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs/{tool}/{gene}.prg.fa"
