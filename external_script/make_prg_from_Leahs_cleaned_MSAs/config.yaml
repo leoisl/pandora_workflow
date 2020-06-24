@@ -1,0 +1,3 @@
+msas_dir: msas
+output_dir: output
+make_prg_dependencies_img: "containers/make_prg_dependencies.simg"

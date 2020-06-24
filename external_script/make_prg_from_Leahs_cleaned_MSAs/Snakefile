@@ -1,0 +1,119 @@
+from pathlib import Path
+from snakemake.utils import min_version
+from glob import glob
+import fileinput
+min_version("5.4.0")
+
+# ======================================================
+# Config files
+# ======================================================
+configfile: "config.yaml"
+
+
+# ======================================================
+# Variables
+# ======================================================
+msas_dir = config["msas_dir"]
+output_dir = config["output_dir"]
+
+genes = []
+for file in glob(f"{msas_dir}/*.clean.fa"):
+    gene = Path(file).name.replace(".clean.fa", "")
+    genes.append(gene)
+
+
+rule all:
+    input:
+        expand(output_dir + "/prgs/custom/{gene}.prg.fa", gene=genes),
+        output_dir + "/prgs/prg.fa",
+        output_dir + "/msas/msas_csv"
+
+
+
+rule fix_msa_dir:
+    input:
+        msa = msas_dir + "/{gene}.clean.fa"
+    output:
+        fixed_msa = output_dir + "/msas/custom/{gene}.fa"
+    threads: 1
+    resources:
+        mem_mb = 100
+    log:
+        "logs/fix_msa_dir/{gene}.log"
+    shell:
+        "cp {input.msa} {output.fixed_msa}"
+
+rule make_msas_csv:
+    input:
+        msas = expand(rules.fix_msa_dir.output.fixed_msa, gene=genes)
+    output:
+        msas_csv = output_dir + "/msas/msas_csv"
+    threads: 1
+    resources:
+        mem_mb = 100
+    log:
+        "logs/make_msas_csv.log"
+    run:
+        with open(output.msas_csv, "w") as fout:
+            print("msas_absolute_paths", file=fout)
+            for msa in input.msas:
+                absolute_path_msa = Path(msa).absolute()
+                print(str(absolute_path_msa), file=fout)
+
+
+
+rule make_prg:
+    input:
+        msa = rules.fix_msa_dir.output.fixed_msa
+    output:
+        prg = output_dir + "/prgs/custom/{gene}.prg.fa"
+    threads: 1
+    resources:
+        mem_mb = lambda wildcards, attempt: {1: 2000, 2: 4000, 3: 8000}.get(attempt, 32000)
+    params:
+        log_level = "DEBUG",
+        make_prg_script = "make_prg_from_msa.py",
+        max_nesting_lvl = config.get("max_nesting_lvl", 5),
+        prefix = lambda wildcards, output: output.prg.replace("".join(Path(output.prg).suffixes), ""),
+    singularity: config["make_prg_dependencies_img"]
+    log:
+        "logs/make_prg/{gene}.log"
+    script:
+        "make_prg.py"
+
+
+def is_header(line):
+    return line.startswith(">")
+
+
+def get_PRG_sequence(line):
+    prg_sequence = line.rstrip()
+    line_ends_digit = prg_sequence[-1].isdigit()
+    if line_ends_digit:
+        prg_sequence += " "
+    return prg_sequence
+
+
+def concatenate_several_prgs_into_one(input_prgs, output_prg):
+    with open(output_prg, "w") as fout, fileinput.input(input_prgs) as fin:
+        for line in fin:
+            if is_header(line):
+                fout.write(line)
+            else:
+                prg_sequence = get_PRG_sequence(line)
+                fout.write(prg_sequence + "\n")
+
+
+
+rule aggregate_prgs:
+    input:
+        prgs = expand(output_dir + "/prgs/custom/{gene}.prg.fa", gene=genes)
+    output:
+        prg = output_dir + "/prgs/prg.fa"
+    threads: 1
+    resources:
+        mem_mb = lambda wildcards, attempt: 2000 * attempt
+    log:
+        "logs/aggregate_prgs.log"
+    run:
+        concatenate_several_prgs_into_one(input.prgs, output.prg)
