@@ -29,7 +29,7 @@ rule all:
     input:
         expand(output_dir + "/prgs/custom/{gene}.prg.fa", gene=genes),
         output_dir + "/prgs/prg.fa",
-        output_dir + "/msas/msas_csv"
+        output_dir + "/msas/msas.csv"
 
 
 
@@ -50,7 +50,7 @@ rule make_msas_csv:
     input:
         msas = expand(rules.fix_msa_dir.output.fixed_msa, gene=genes)
     output:
-        msas_csv = output_dir + "/msas/msas_csv"
+        msas_csv = output_dir + "/msas/msas.csv"
     threads: 1
     resources:
         mem_mb = 100
