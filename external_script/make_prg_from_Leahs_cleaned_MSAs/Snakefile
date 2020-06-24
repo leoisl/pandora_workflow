@@ -2,6 +2,7 @@ from pathlib import Path
 from snakemake.utils import min_version
 from glob import glob
 import fileinput
+import os
 min_version("5.4.0")
 
 # ======================================================
@@ -18,8 +19,10 @@ output_dir = config["output_dir"]
 
 genes = []
 for file in glob(f"{msas_dir}/*.clean.fa"):
-    gene = Path(file).name.replace(".clean.fa", "")
-    genes.append(gene)
+    file_is_empty = os.stat(file).st_size == 0
+    if not file_is_empty:
+        gene = Path(file).name.replace(".clean.fa", "")
+        genes.append(gene)
 
 
 rule all:
