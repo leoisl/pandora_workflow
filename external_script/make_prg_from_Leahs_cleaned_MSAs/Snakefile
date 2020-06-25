@@ -120,3 +120,6 @@ rule aggregate_prgs:
         "logs/aggregate_prgs.log"
     run:
         concatenate_several_prgs_into_one(input.prgs, output.prg)
+
+
+localrules: fix_msa_dir
