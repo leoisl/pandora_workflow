@@ -28,13 +28,7 @@ def aggregate_prgs_with_denovo_path_input(wildcards):
                                                           wildcards.sub_strategy, samples)
     input_files = []
     for gene in genes_with_denovo_paths:
-        if gene.startswith("GC"):
-            tool = "panx"
-        elif gene.startswith("Clus"):
-            tool = "piggy"
-        else:
-            tool = "custom"
-
+        tool = "custom"
         input_files.append(
             f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs/{tool}/{gene}.prg.fa"
         )
