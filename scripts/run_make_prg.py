@@ -1,5 +1,9 @@
-import subprocess
 from pathlib import Path
+import sys
+sys.path.append(str(Path().absolute()))
+
+import subprocess
+from utils import *
 import logging
 log_level = snakemake.params.log_level
 logging.basicConfig(
@@ -9,7 +13,7 @@ logging.basicConfig(
     format="[%(asctime)s]:%(levelname)s: %(message)s",
     datefmt="%d/%m/%Y %I:%M:%S %p",
 )
-from .utils import *
+
 
 
 def build_prg_after_adding_denovo_paths(
