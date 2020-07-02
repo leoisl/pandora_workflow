@@ -1,6 +1,7 @@
 from pathlib import Path
 import pandas as pd
 import fileinput
+from scripts.utils import *
 
 
 def get_genes_with_denovo_paths(analysis_output_dir, technology, coverage, sub_strategy, samples):
@@ -35,24 +36,6 @@ def aggregate_prgs_with_denovo_path_input(wildcards):
     return input_files
 
 
-def is_header(line):
-    return line.startswith(">")
-
-
-def get_gene(line):
-    stripped_line = line.rstrip()
-    gene = stripped_line[1:]
-    return gene
-
-
-def get_PRG_sequence(line):
-    prg_sequence = line.rstrip()
-    line_ends_digit = prg_sequence[-1].isdigit()
-    if line_ends_digit:
-        prg_sequence += " "
-    return prg_sequence
-
-
 rule aggregate_prgs_without_denovo_path:
     input:
         map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"])
@@ -70,15 +53,9 @@ rule aggregate_prgs_without_denovo_path:
                                                           wildcards.sub_strategy, samples)
         genes_without_denovo_paths = get_genes_without_denovo_paths(genes_with_denovo_paths, msas_csv)
 
-        with open(params.original_prg) as original_prg, open(output.prgs_without_denovo_paths, "w") as prgs_without_denovo_paths:
-            for line in original_prg:
-                if is_header(line):
-                    gene = get_gene(line)
-                else:
-                    if gene in genes_without_denovo_paths:
-                        prg_sequence = get_PRG_sequence(line)
-                        prgs_without_denovo_paths.write(">" + gene + "\n")
-                        prgs_without_denovo_paths.write(prg_sequence + "\n")
+        get_PRGs_from_original_PRG_restricted_to_list_of_genes(params.original_prg, output.prgs_without_denovo_paths,
+                                                               genes_without_denovo_paths)
+
 
 
 rule run_clustalo_after_adding_MSA_path:

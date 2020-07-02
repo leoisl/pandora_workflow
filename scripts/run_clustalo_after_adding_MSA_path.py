@@ -58,25 +58,6 @@ def run_msa_after_adding_denovo_paths(
     logging.info("Multiple sequence alignment finished.")
 
 
-def build_prg_after_adding_denovo_paths(
-    make_prg_script: str,
-    max_nesting_lvl: int,
-    prefix: str,
-    msa: str,
-    prg: TextIO,
-    gene: str,
-):
-    logging.info("Building PRG for MSA.")
-    shell(
-        f"python3 {make_prg_script} -v --max_nesting {max_nesting_lvl} --prefix {prefix} {msa}"
-    )
-    logging.info("Finished building PRG.")
-    logging.debug("Adding header info to PRG and renaming to correct filepath.")
-    prg.write(f">{gene}\n")
-    tmp_prg = Path(f"{prefix}.max_nest{max_nesting_lvl}.min_match7.prg")
-    prg.write(tmp_prg.read_text() + "\n")
-
-
 def main():
     old_msa = Path(snakemake.input.msa)
     denovo_dirs = snakemake.params.denovo_dirs

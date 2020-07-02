@@ -1,5 +1,5 @@
 from pathlib import Path
-from rules.utils import get_technology_param
+from scripts.utils import get_technology_param
 
 
 rule index_prg_updated_with_denovo_paths:
