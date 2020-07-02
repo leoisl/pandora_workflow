@@ -78,11 +78,10 @@ def build_prg_after_adding_denovo_paths(
 
 
 def main():
-    appended_msa = Path(snakemake.output.appended_msa)
-    updated_msa = Path(snakemake.output.updated_msa)
     old_msa = Path(snakemake.input.msa)
-    prg = Path(snakemake.output.prg)
     denovo_dirs = snakemake.params.denovo_dirs
+    updated_msa = Path(snakemake.output.updated_msa)
+    appended_msa = Path(snakemake.output.appended_msa)
 
     if not appended_msa.parent.is_dir():
         logging.debug("Creating parent directory for new MSA.")
@@ -99,15 +98,5 @@ def main():
         run_msa_after_adding_denovo_paths(
             str(appended_msa), str(updated_msa), snakemake.threads
         )
-        with prg.open("w") as prg_fh:
-            build_prg_after_adding_denovo_paths(
-                snakemake.params.make_prg_script,
-                snakemake.params.max_nesting_lvl,
-                snakemake.params.prefix,
-                str(updated_msa),
-                prg_fh,
-                snakemake.wildcards.gene,
-            )
-
 
 main()

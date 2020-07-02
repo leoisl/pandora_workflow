@@ -81,31 +81,47 @@ rule aggregate_prgs_without_denovo_path:
                         prgs_without_denovo_paths.write(prg_sequence + "\n")
 
 
-rule add_denovo_paths:
+rule run_clustalo_after_adding_MSA_path:
     input:
         map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]),
         msa = msas_dir + "/{clustering_tool}/{gene}.fa"
     output:
         updated_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
         appended_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
-        prg = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa"
     threads: 8
     shadow: "shallow"
     resources:
-        mem_mb = lambda wildcards, attempt: {1: 8000, 2: 32000, 3: 64000}.get(attempt, 120000)
+        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 16000, 3: 32000}.get(attempt, 64000)
+    params:
+        denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
+                                                for map_with_discovery_dir in input.map_with_discovery_dirs]
+    singularity: config["make_prg_dependencies_img"]
+    log:
+        "logs/run_clustalo_after_adding_MSA_path/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
+    script:
+        "../scripts/run_clustalo_after_adding_MSA_path.py"
+
+
+rule run_make_prg:
+    input:
+        updated_msa = rules.run_clustalo_after_adding_MSA_path.output.updated_msa
+    output:
+        prg = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa"
+    threads: 1
+    shadow: "shallow"
+    resources:
+        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 16000, 3: 32000}.get(attempt, 64000)
     params:
         log_level = "DEBUG",
         make_prg_script = "scripts/make_prg_from_msa.py",
         max_nesting_lvl = config.get("max_nesting_lvl", 5),
         prefix = lambda wildcards, output: output.prg.replace("".join(Path(output.prg).suffixes), ""),
         original_prg = config["original_prg"],
-        denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
-                                                for map_with_discovery_dir in input.map_with_discovery_dirs]
     singularity: config["make_prg_dependencies_img"]
     log:
-        "logs/add_denovo_paths/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
+        "logs/run_make_prg/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
     script:
-        "../scripts/add_denovo_paths.py"
+        "../scripts/run_make_prg.py"
 
 
 def concatenate_several_prgs_into_one(input_prgs, output_prg):
