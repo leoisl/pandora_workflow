@@ -52,9 +52,8 @@ rule aggregate_prgs_without_denovo_path:
         genes_with_denovo_paths = get_genes_with_denovo_paths(analysis_output_dir, wildcards.technology, wildcards.coverage,
                                                           wildcards.sub_strategy, samples)
         genes_without_denovo_paths = get_genes_without_denovo_paths(genes_with_denovo_paths, msas_csv)
-
-        get_PRGs_from_original_PRG_restricted_to_list_of_genes(params.original_prg, output.prgs_without_denovo_paths,
-                                                               genes_without_denovo_paths)
+        with open(params.original_prg) as original_prg_fh, open(output.prgs_without_denovo_paths, "w") as prgs_without_denovo_paths_fh:
+            get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prgs_without_denovo_paths_fh, genes_without_denovo_paths)
 
 
 
@@ -94,6 +93,7 @@ rule run_make_prg:
         max_nesting_lvl = config.get("max_nesting_lvl", 5),
         prefix = lambda wildcards, output: output.prg.replace("".join(Path(output.prg).suffixes), ""),
         original_prg = config["original_prg"],
+        make_prg_timeout_in_second = make_prg_timeout_in_second,
     singularity: config["make_prg_dependencies_img"]
     log:
         "logs/run_make_prg/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"

@@ -5,6 +5,7 @@ msas_dir: "data/msas"
 prgs_dir: "data/prgs"
 analysis_output_dir: "analysis"
 msas_csv: "data/msas/msas.csv"
+make_prg_timeout_in_second: 43200
 
 coverages:
   - 30
