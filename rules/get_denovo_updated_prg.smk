@@ -69,6 +69,7 @@ rule run_clustalo_after_adding_MSA_path:
     resources:
         mem_mb = lambda wildcards, attempt: {1: 4000, 2: 16000, 3: 32000}.get(attempt, 64000)
     params:
+        log_level = "DEBUG",
         denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
                                                 for map_with_discovery_dir in input.map_with_discovery_dirs]
     singularity: config["make_prg_dependencies_img"]
