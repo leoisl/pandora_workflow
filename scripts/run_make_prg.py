@@ -9,7 +9,7 @@ logging.basicConfig(
     format="[%(asctime)s]:%(levelname)s: %(message)s",
     datefmt="%d/%m/%Y %I:%M:%S %p",
 )
-from scripts.utils import *
+from .utils import *
 
 
 def build_prg_after_adding_denovo_paths(
