@@ -83,7 +83,8 @@ rule run_make_prg:
     input:
         updated_msa = rules.run_clustalo_after_adding_MSA_path.output.updated_msa
     output:
-        prg = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa"
+        prg = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa",
+        run_status =  analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs_run_status/{clustering_tool}/{gene}.status",
     threads: 1
     shadow: "shallow"
     resources:
@@ -95,6 +96,7 @@ rule run_make_prg:
         prefix = lambda wildcards, output: output.prg.replace("".join(Path(output.prg).suffixes), ""),
         original_prg = config["original_prg"],
         make_prg_timeout_in_second = make_prg_timeout_in_second,
+        make_prg_memory_limit = make_prg_memory_limit,
     singularity: config["make_prg_dependencies_img"]
     log:
         "logs/run_make_prg/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
