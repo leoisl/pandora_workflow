@@ -89,6 +89,7 @@ rule run_make_prg:
     shadow: "shallow"
     resources:
         mem_mb = lambda wildcards, attempt: {1: 4000, 2: 16000, 3: 32000}.get(attempt, 64000)
+    priority: 100
     params:
         log_level = "DEBUG",
         make_prg_script = "scripts/make_prg_from_msa.py",
