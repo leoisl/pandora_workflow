@@ -67,8 +67,8 @@ def get_mem_mb_given_to_job():
 
 def main():
     updated_msa = Path(snakemake.input.updated_msa)
-    run_status = Path(snakemake.input.run_status)
     prg = Path(snakemake.output.prg)
+    run_status = Path(snakemake.output.run_status)
     original_prg = Path(snakemake.params.original_prg)
     mem_mb_given_to_job = get_mem_mb_given_to_job()
     max_mb_allowed = int(snakemake.params.make_prg_memory_limit)
