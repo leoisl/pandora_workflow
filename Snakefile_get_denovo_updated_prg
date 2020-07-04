@@ -23,6 +23,7 @@ prgs_dir = config["prgs_dir"]
 analysis_output_dir = config["analysis_output_dir"]
 msas_csv = config["msas_csv"]
 samples = config["samples"]
+make_prg_timeout_in_second = int(config["make_prg_timeout_in_second"])
 
 
 output_files = []
