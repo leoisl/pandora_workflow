@@ -18,10 +18,10 @@ msas_dir = config["msas_dir"]
 output_dir = config["output_dir"]
 
 genes = []
-for file in glob(f"{msas_dir}/*.clean.fa"):
+for file in glob(f"{msas_dir}/*.fa"):
     file_is_empty = os.stat(file).st_size == 0
     if not file_is_empty:
-        gene = Path(file).name.replace(".clean.fa", "")
+        gene = Path(file).name.replace(".fa", "")
         genes.append(gene)
 
 
@@ -35,7 +35,7 @@ rule all:
 
 rule fix_msa_dir:
     input:
-        msa = msas_dir + "/{gene}.clean.fa"
+        msa = msas_dir + "/{gene}.fa"
     output:
         fixed_msa = output_dir + "/msas/custom/{gene}.fa"
     threads: 1
