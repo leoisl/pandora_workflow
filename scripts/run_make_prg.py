@@ -28,8 +28,14 @@ def build_prg_after_adding_denovo_paths(
     timeout_in_seconds: int,
     mem_mb_given_to_job: int,
     max_mb_allowed: int,
-    run_status_fh: TextIO
+    run_status_fh: TextIO,
+    clustalo_run_was_ok: bool
 ):
+    if not clustalo_run_was_ok:
+        with original_prg.open() as original_prg_fh:
+            get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prg, [gene])
+        run_status_fh.write("FAIL : Clustalo Failed\n")
+
     try:
         logging.info("Building PRG for MSA.")
         subprocess.check_call(
@@ -58,6 +64,10 @@ def build_prg_after_adding_denovo_paths(
                 get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prg, [gene])
             run_status_fh.write("FAIL : Memory Limit Exceeded\n")
 
+def check_if_clustalo_run_was_ok(clustalo_run_status_filepath: Path) -> bool:
+    clustalo_run_status = clustalo_run_status_filepath.read_text()
+    return  "SUCCESS" in clustalo_run_status
+
 def main():
     updated_msa = Path(snakemake.input.updated_msa)
     prg = Path(snakemake.output.prg)
@@ -65,6 +75,9 @@ def main():
     original_prg = Path(snakemake.params.original_prg)
     max_mb_allowed = int(snakemake.params.make_prg_memory_limit)
     mem_mb_given_to_job = int(snakemake.params.mem_mb)
+    clustalo_run_status_filepath = Path(snakemake.input.clustalo_run_status)
+
+    clustalo_run_was_ok = check_if_clustalo_run_was_ok(clustalo_run_status_filepath)
 
 
     with prg.open("w") as prg_fh, run_status.open("w") as run_status_fh:
@@ -79,7 +92,8 @@ def main():
             snakemake.params.make_prg_timeout_in_second,
             mem_mb_given_to_job,
             max_mb_allowed,
-            run_status_fh
+            run_status_fh,
+            clustalo_run_was_ok
         )
 
 

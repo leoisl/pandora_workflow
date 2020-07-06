@@ -95,7 +95,6 @@ rule run_clustalo_after_adding_MSA_path:
         log_level = "DEBUG",
         denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
                                                 for map_with_discovery_dir in input.map_with_discovery_dirs],
-        original_prg = config["original_prg"],
         clustalo_timeout_in_second = clustalo_timeout_in_second
     singularity: config["make_prg_dependencies_img"]
     log:
@@ -106,7 +105,8 @@ rule run_clustalo_after_adding_MSA_path:
 
 rule run_make_prg:
     input:
-        updated_msa = rules.run_clustalo_after_adding_MSA_path.output.updated_msa
+        updated_msa = rules.run_clustalo_after_adding_MSA_path.output.updated_msa,
+        clustalo_run_status = rules.run_clustalo_after_adding_MSA_path.output.run_status,
     output:
         prg = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa",
         run_status =  analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs_run_status/{clustering_tool}/{gene}.status",

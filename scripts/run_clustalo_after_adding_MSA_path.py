@@ -54,40 +54,26 @@ def append_denovo_paths_to_msa(
 
 
 def run_msa_after_adding_denovo_paths(
-    appended_msa: str, updated_msa: str, threads: int, gene: str, original_prg: Path, timeout_in_seconds: int, msa_run_status_filename: str
+    appended_msa: str, updated_msa: str, threads: int, timeout_in_seconds: int, run_status_fh: TextIO
 ):
-    with open(msa_run_status_filename, "w") as msa_run_status_fh:
-        try:
-            logging.info("Running multiple sequence alignment.")
-            subprocess.check_call(
-                f"clustalo --dealign --threads {threads} --in {appended_msa} --out {updated_msa}",
-                shell=True,
-                timeout=timeout_in_seconds
-            )
-            msa_run_status_fh.write("SUCCESS\n")
-            logging.info("Multiple sequence alignment finished.")
-        except subprocess.TimeoutExpired:
-            # we timed-out
-            logging.info("[WARNING]: Timeout reached, copying previous PRG.")
+    try:
+        logging.info("Running multiple sequence alignment.")
+        subprocess.check_call(
+            f"clustalo --dealign --threads {threads} --in {appended_msa} --out {updated_msa}",
+            shell=True,
+            timeout=timeout_in_seconds
+        )
+        run_status_fh.write("SUCCESS\n")
+        logging.info("Multiple sequence alignment finished.")
+    except subprocess.TimeoutExpired:
+        # we timed-out
+        logging.info("[WARNING]: Timeout reached, making MSA empty.")
 
-            # let's just touch the new MSA to tell snakemake things are fine, they were "done"
-            shell(f"touch {updated_msa}")
+        # let's just create and empty MSA to tell snakemake things are fine, they were "done"
+        shell(f"echo '' > {updated_msa}")
 
-            # log this
-            msa_run_status_fh.write("FAIL : TimeoutExpired\n")
-
-            # now we make files to skip make_prg
-            # let's just copy the previous PRG
-            prg_filename = updated_msa.replace(".clustalo.fa", ".prg.fa")
-            with original_prg.open() as original_prg_fh, open(prg_filename, "w") as prg:
-                get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prg, [gene])
-
-            # log this also
-            prg_run_status_filename = msa_run_status_filename.replace("msas_run_status", "prgs_run_status")
-            with open(prg_run_status_filename, "w") as prg_run_status_fh:
-                prg_run_status_fh.write("FAIL : Clustalo\n")
-
-
+        # log this
+        run_status_fh.write("FAIL : TimeoutExpired\n")
 
 
 def main():
@@ -95,10 +81,8 @@ def main():
     denovo_dirs = snakemake.params.denovo_dirs
     updated_msa = Path(snakemake.output.updated_msa)
     appended_msa = Path(snakemake.output.appended_msa)
-    gene = snakemake.wildcards.gene
-    original_prg = Path(snakemake.params.original_prg)
     timeout_in_seconds = snakemake.params.clustalo_timeout_in_second
-    run_status = snakemake.output.run_status
+    run_status = Path(snakemake.output.run_status)
 
     if not appended_msa.parent.is_dir():
         logging.debug("Creating parent directory for new MSA.")
@@ -112,8 +96,9 @@ def main():
         with appended_msa.open("w") as fh_out:
             append_denovo_paths_to_msa(denovo_paths, fh_out, old_msa)
 
-        run_msa_after_adding_denovo_paths(
-            str(appended_msa), str(updated_msa), snakemake.threads, gene, original_prg, timeout_in_seconds, run_status
-        )
+        with run_status.open("w") as run_status_fh:
+            run_msa_after_adding_denovo_paths(
+                str(appended_msa), str(updated_msa), snakemake.threads, timeout_in_seconds, run_status_fh
+            )
 
 main()
