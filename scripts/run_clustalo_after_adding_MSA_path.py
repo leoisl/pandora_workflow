@@ -64,7 +64,7 @@ def run_msa_after_adding_denovo_paths(
                 shell=True,
                 timeout=timeout_in_seconds
             )
-            msa_run_status_fh.write("SUCCESS")
+            msa_run_status_fh.write("SUCCESS\n")
             logging.info("Multiple sequence alignment finished.")
         except subprocess.TimeoutExpired:
             # we timed-out
@@ -74,7 +74,7 @@ def run_msa_after_adding_denovo_paths(
             shell(f"touch {updated_msa}")
 
             # log this
-            msa_run_status_fh.write("FAIL : TimeoutExpired")
+            msa_run_status_fh.write("FAIL : TimeoutExpired\n")
 
             # now we make files to skip make_prg
             # let's just copy the previous PRG
@@ -85,7 +85,7 @@ def run_msa_after_adding_denovo_paths(
             # log this also
             prg_run_status_filename = msa_run_status_filename.replace("msas_run_status", "prgs_run_status")
             with open(prg_run_status_filename, "w") as prg_run_status_fh:
-                prg_run_status_fh.write("FAIL : Clustalo")
+                prg_run_status_fh.write("FAIL : Clustalo\n")
 
 
 

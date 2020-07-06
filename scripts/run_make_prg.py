@@ -43,20 +43,20 @@ def build_prg_after_adding_denovo_paths(
         prg.write(f">{gene}\n")
         tmp_prg = Path(f"{prefix}.max_nest{max_nesting_lvl}.min_match7.prg")
         prg.write(tmp_prg.read_text() + "\n")
-        run_status_fh.write("SUCCESS")
+        run_status_fh.write("SUCCESS\n")
 
     except subprocess.TimeoutExpired:
         # we timed-out, let's just copy the previous PRG
         logging.info("[WARNING]: Timeout reached, copying previous PRG.")
         with original_prg.open() as original_prg_fh:
             get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prg, [gene])
-        run_status_fh.write("FAIL : TimeoutExpired")
+        run_status_fh.write("FAIL : TimeoutExpired\n")
     except KeyboardInterrupt: # memory limit reached
         if mem_mb_given_to_job >= max_mb_allowed:
             logging.info("[WARNING]: Memory limit exceeded, copying previous PRG.")
             with original_prg.open() as original_prg_fh:
                 get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prg, [gene])
-            run_status_fh.write("FAIL : Memory Limit Exceeded")
+            run_status_fh.write("FAIL : Memory Limit Exceeded\n")
 
 def main():
     updated_msa = Path(snakemake.input.updated_msa)
