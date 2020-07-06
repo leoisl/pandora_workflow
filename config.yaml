@@ -5,7 +5,8 @@ msas_dir: "data/msas"
 prgs_dir: "data/prgs"
 analysis_output_dir: "analysis"
 msas_csv: "data/msas/msas.csv"
-make_prg_timeout_in_second: 43200
+make_prg_timeout_in_second: 21600
+clustalo_timeout_in_second: 21600
 make_prg_memory_limit: 32000
 
 coverages:

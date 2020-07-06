@@ -64,6 +64,7 @@ rule run_clustalo_after_adding_MSA_path:
     output:
         updated_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
         appended_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
+        run_status =  analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas_run_status/{clustering_tool}/{gene}.status",
     threads: 8
     shadow: "shallow"
     resources:
@@ -71,7 +72,9 @@ rule run_clustalo_after_adding_MSA_path:
     params:
         log_level = "DEBUG",
         denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
-                                                for map_with_discovery_dir in input.map_with_discovery_dirs]
+                                                for map_with_discovery_dir in input.map_with_discovery_dirs],
+        original_prg = config["original_prg"],
+        clustalo_timeout_in_second = clustalo_timeout_in_second
     singularity: config["make_prg_dependencies_img"]
     log:
         "logs/run_clustalo_after_adding_MSA_path/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"

@@ -1,11 +1,10 @@
 from pathlib import Path
 import sys
 sys.path.append(str(Path().absolute()))
-from snakemake.utils import read_job_properties
-from typing import TextIO
 
-import subprocess
 from utils import *
+from typing import TextIO
+import subprocess
 import logging
 log_level = snakemake.params.log_level
 logging.basicConfig(
