@@ -87,7 +87,7 @@ rule run_clustalo_after_adding_MSA_path:
         updated_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
         appended_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
         run_status =  analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas_run_status/{clustering_tool}/{gene}.status",
-    threads: 8
+    threads: 4
     shadow: "shallow"
     resources:
         mem_mb = lambda wildcards, attempt: {1: 4000, 2: 16000, 3: 32000}.get(attempt, 64000)
@@ -113,8 +113,7 @@ rule run_make_prg:
     threads: 1
     shadow: "shallow"
     resources:
-        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 16000, 3: 32000}.get(attempt, 64000)
-    priority: 100
+        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 12000, 3: 32000}.get(attempt, 64000)
     params:
         log_level = "DEBUG",
         make_prg_script = "scripts/make_prg_from_msa.py",

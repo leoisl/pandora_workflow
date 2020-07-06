@@ -80,6 +80,11 @@ def main():
 
     clustalo_run_was_ok = check_if_clustalo_run_was_ok(clustalo_run_status_filepath)
 
+    logging.info(f"max_mb_allowed = {max_mb_allowed}")
+    logging.info(f"mem_mb_given_to_job = {mem_mb_given_to_job}")
+    logging.info(f"clustalo_run_was_ok = {clustalo_run_was_ok}")
+
+
 
     with prg.open("w") as prg_fh, run_status.open("w") as run_status_fh:
         build_prg_after_adding_denovo_paths(
