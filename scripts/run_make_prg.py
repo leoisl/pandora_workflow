@@ -35,6 +35,7 @@ def build_prg_after_adding_denovo_paths(
         with original_prg.open() as original_prg_fh:
             get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prg, [gene])
         run_status_fh.write("FAIL : Clustalo Failed\n")
+        return
 
     try:
         logging.info("Building PRG for MSA.")
