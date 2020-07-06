@@ -36,6 +36,8 @@ for technology, sample, coverage, strategy in itertools.product(
                                                     config["subsample"]["strategies"]):
     output_files.extend([
         f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/prgs/denovo_updated.prg.fa",
+        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/all_msas_run_status.txt",
+        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/all_prgs_run_status.txt",
     ])
 
 
