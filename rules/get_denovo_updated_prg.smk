@@ -35,6 +35,28 @@ def aggregate_prgs_with_denovo_path_input(wildcards):
         )
     return input_files
 
+def aggregate_msas_status_input_files(wildcards):
+    genes_with_denovo_paths = get_genes_with_denovo_paths(analysis_output_dir, wildcards.technology, wildcards.coverage,
+                                                          wildcards.sub_strategy, samples)
+    input_files = []
+    for gene in genes_with_denovo_paths:
+        tool = "custom"
+        input_files.append(
+            f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/msas_run_status/{tool}/{gene}.status"
+        )
+    return input_files
+
+def aggregate_prgs_status_input_files(wildcards):
+    genes_with_denovo_paths = get_genes_with_denovo_paths(analysis_output_dir, wildcards.technology, wildcards.coverage,
+                                                          wildcards.sub_strategy, samples)
+    input_files = []
+    for gene in genes_with_denovo_paths:
+        tool = "custom"
+        input_files.append(
+            f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs_run_status/{tool}/{gene}.status"
+        )
+    return input_files
+
 
 rule aggregate_prgs_without_denovo_path:
     input:
@@ -132,6 +154,34 @@ rule aggregate_prgs_with_denovo_path:
         "logs/aggregate_prgs_with_denovo_path/{technology}/{coverage}x/{sub_strategy}/.log"
     run:
         concatenate_several_prgs_into_one(input.prgs, output.prgs_with_denovo_paths)
+
+
+rule aggregate_msas_run_status:
+    input:
+        aggregate_msas_status_input_files
+    output:
+        aggregated_msas_run_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_msas_run_status.txt",
+    threads: 1
+    resources:
+        mem_mb = lambda wildcards, attempt: 2000 * attempt
+    log:
+        "logs/aggregate_msas_run_status/{technology}/{coverage}x/{sub_strategy}/aggregate_msas_run_status.log"
+    shell:
+        "cat {input} > {output}"
+
+
+rule aggregate_prgs_run_status:
+    input:
+        aggregate_prgs_status_input_files
+    output:
+        aggregated_prgs_run_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_prgs_run_status.txt",
+    threads: 1
+    resources:
+        mem_mb = lambda wildcards, attempt: 2000 * attempt
+    log:
+        "logs/aggregate_prgs_run_status/{technology}/{coverage}x/{sub_strategy}/aggregate_prgs_run_status.log"
+    shell:
+        "cat {input} > {output}"
 
 
 rule aggregate_prgs:
