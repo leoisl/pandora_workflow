@@ -87,10 +87,10 @@ rule run_clustalo_after_adding_MSA_path:
         updated_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
         appended_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
         run_status =  analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas_run_status/{clustering_tool}/{gene}.status",
-    threads: 4
+    threads: 1
     shadow: "shallow"
     resources:
-        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 16000, 3: 32000}.get(attempt, 64000)
+        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 8000, 3: 16000}.get(attempt, 32000)
     params:
         log_level = "DEBUG",
         denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
