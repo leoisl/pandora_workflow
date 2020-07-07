@@ -14,11 +14,12 @@ configfile: "config.yaml"
 # ======================================================
 # Variables
 # ======================================================
-msas_dir = config["msas_dir"]
+input_fasta_dir = config["input_fasta_dir"]
 output_dir = config["output_dir"]
+run_MSA = bool(config["run_MSA"])
 
 genes = []
-for file in glob(f"{msas_dir}/*.fa"):
+for file in glob(f"{input_fasta_dir}/*.fa"):
     file_is_empty = os.stat(file).st_size == 0
     if not file_is_empty:
         gene = Path(file).name.replace(".fa", "")
@@ -33,22 +34,27 @@ rule all:
 
 
 
-rule fix_msa_dir:
+rule cp_or_run_MSA:
     input:
-        msa = msas_dir + "/{gene}.fa"
+        previous_gene = input_fasta_dir + "/{gene}.fa"
     output:
-        fixed_msa = output_dir + "/msas/custom/{gene}.fa"
+        msa = output_dir + "/msas/custom/{gene}.fa"
+    params:
+        run_MSA = run_MSA,
+        log_level = "DEBUG",
     threads: 1
+    shadow: "shallow"
     resources:
-        mem_mb = 100
+        mem_mb = lambda wildcards, attempt: {1: 2000, 2: 4000, 3: 8000}.get(attempt, 32000)
     log:
-        "logs/fix_msa_dir/{gene}.log"
-    shell:
-        "cp {input.msa} {output.fixed_msa}"
+        "logs/cp_or_run_MSA/{gene}.log"
+    singularity: config["make_prg_dependencies_img"]
+    script:
+        "cp_or_run_MSA.py"
 
 rule make_msas_csv:
     input:
-        msas = expand(rules.fix_msa_dir.output.fixed_msa, gene=genes)
+        msas = expand(rules.cp_or_run_MSA.output.msa, gene=genes)
     output:
         msas_csv = output_dir + "/msas/msas.csv"
     threads: 1
@@ -67,12 +73,12 @@ rule make_msas_csv:
 
 rule make_prg:
     input:
-        msa = rules.fix_msa_dir.output.fixed_msa
+        msa = rules.cp_or_run_MSA.output.msa
     output:
         prg = output_dir + "/prgs/custom/{gene}.prg.fa"
     threads: 1
     resources:
-        mem_mb = lambda wildcards, attempt: {1: 2000, 2: 4000, 3: 8000}.get(attempt, 32000)
+        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 16000, 3: 32000}.get(attempt, 64000)
     params:
         log_level = "DEBUG",
         make_prg_script = "make_prg_from_msa.py",
@@ -120,6 +126,3 @@ rule aggregate_prgs:
         "logs/aggregate_prgs.log"
     run:
         concatenate_several_prgs_into_one(input.prgs, output.prg)
-
-
-localrules: fix_msa_dir

@@ -1,3 +1,4 @@
-msas_dir: msas
+input_fasta_dir: fastas
 output_dir: output
+run_MSA: True
 make_prg_dependencies_img: "containers/make_prg_dependencies.simg"
