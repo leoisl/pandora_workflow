@@ -17,11 +17,14 @@ def main():
     threads = snakemake.threads
 
     if not run_MSA:
+        print("Copying...")
         shell(f"cp {previous_gene} {msa}")
     else:
         if there_is_only_one_sequence(previous_gene):
+            print("Copying...")
             shell(f"cp {previous_gene} {msa}")
         else:
+            print("Aligning...")
             shell(f"clustalo --dealign --threads {threads} --in {previous_gene} --out {msa}")
 
 main()
