@@ -40,8 +40,7 @@ def build_prg_after_adding_denovo_paths(
     try:
         logging.info("Building PRG for MSA.")
         subprocess.check_call(
-            f"python3 {make_prg_script} -v --max_nesting {max_nesting_lvl} --prefix {prefix} {msa}",
-            shell=True,
+            ["python3", make_prg_script, "-v", "--max_nesting", str(max_nesting_lvl), "--prefix", prefix, msa],
             timeout=timeout_in_seconds
         )
         logging.info("Finished building PRG.")

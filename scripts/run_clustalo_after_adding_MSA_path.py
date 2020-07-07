@@ -59,8 +59,7 @@ def run_msa_after_adding_denovo_paths(
     try:
         logging.info("Running multiple sequence alignment.")
         subprocess.check_call(
-            f"clustalo --dealign --threads {threads} --in {appended_msa} --out {updated_msa}",
-            shell=True,
+            ["clustalo", "--dealign", "--threads", str(threads), "--in", appended_msa, "--out", updated_msa],
             timeout=timeout_in_seconds
         )
         run_status_fh.write("SUCCESS\n")
