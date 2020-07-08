@@ -182,7 +182,7 @@ rule aggregate_prgs_run_status:
     input:
         all_prgs_status = aggregate_prgs_status_input_files
     output:
-        aggregated_prgs_status = aggregated_prgs_run_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_prgs_run_status.txt",
+        aggregated_prgs_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_prgs_run_status.txt",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
