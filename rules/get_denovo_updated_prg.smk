@@ -168,7 +168,7 @@ rule aggregate_msas_run_status:
     input:
         all_msas_status = aggregate_msas_status_input_files
     output:
-        aggregated_msas_status = aggregated_msas_run_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_msas_run_status.txt",
+        aggregated_msas_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_msas_run_status.txt",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
