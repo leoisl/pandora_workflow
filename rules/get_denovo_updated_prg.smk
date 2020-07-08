@@ -155,32 +155,41 @@ rule aggregate_prgs_with_denovo_path:
         concatenate_several_prgs_into_one(input.prgs, output.prgs_with_denovo_paths)
 
 
+def cat_first_line(list_of_input_files, output_file):
+    with open(output_file, "w") as output_fh:
+        for input_file in list_of_input_files:
+            with open(input_file) as input_file_fh:
+                first_line = input_file_fh.readline()
+            output_fh.write(first_line)
+
+
+
 rule aggregate_msas_run_status:
     input:
-        aggregate_msas_status_input_files
+        all_msas_status = aggregate_msas_status_input_files
     output:
-        aggregated_msas_run_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_msas_run_status.txt",
+        aggregated_msas_status = aggregated_msas_run_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_msas_run_status.txt",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
     log:
         "logs/aggregate_msas_run_status/{technology}/{coverage}x/{sub_strategy}/aggregate_msas_run_status.log"
-    shell:
-        "cat {input} > {output}"
+    run:
+        cat_first_line(list(input.all_msas_status), output.aggregated_msas_status)
 
 
 rule aggregate_prgs_run_status:
     input:
-        aggregate_prgs_status_input_files
+        all_prgs_status = aggregate_prgs_status_input_files
     output:
-        aggregated_prgs_run_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_prgs_run_status.txt",
+        aggregated_prgs_status = aggregated_prgs_run_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_prgs_run_status.txt",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
     log:
         "logs/aggregate_prgs_run_status/{technology}/{coverage}x/{sub_strategy}/aggregate_prgs_run_status.log"
-    shell:
-        "cat {input} > {output}"
+    run:
+        cat_first_line(list(input.all_prgs_status), output.aggregated_prgs_status)
 
 
 rule aggregate_prgs:
