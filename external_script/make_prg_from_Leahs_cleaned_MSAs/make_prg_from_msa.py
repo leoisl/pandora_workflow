@@ -39,17 +39,18 @@ def get_interval_seqs(interval_alignment):
         )
     ):
         if contains_only(s, allowed):
-            if "N" in s:
-                groups = groupby(s)
-                base_and_consecutive_count = [
-                    (label, sum(1 for _ in group)) for label, group in groups
-                ]
-                for base, count in base_and_consecutive_count:
-                    if base == "N" and count >= 2:
-                        print(
-                            "A sequence contains >=2 Ns in a row - redo sequence curation because this is nonsense"
-                        )
-                        assert base == "N" and count < 2
+            # removed this check. TODO: add it back?
+            # if "N" in s:
+            #     groups = groupby(s)
+            #     base_and_consecutive_count = [
+            #         (label, sum(1 for _ in group)) for label, group in groups
+            #     ]
+            #     for base, count in base_and_consecutive_count:
+            #         if base == "N" and count >= 2:
+            #             print(
+            #                 "A sequence contains >=2 Ns in a row - redo sequence curation because this is nonsense"
+            #             )
+            #             assert base == "N" and count < 2
 
             new_seqs = [s]
             for letter in iupac.keys():
