@@ -31,6 +31,9 @@ def build_prg_after_adding_denovo_paths(
     run_status_fh: TextIO,
     clustalo_run_was_ok: bool
 ):
+    # printing to stdout so that this info is with LSF runtime stats
+    print(f"Number of sequences: {get_number_of_sequences_in_fasta(msa)}")
+
     if not clustalo_run_was_ok:
         with original_prg.open() as original_prg_fh:
             get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prg, [gene])

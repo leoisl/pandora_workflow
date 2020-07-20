@@ -34,3 +34,9 @@ def get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg: TextIO,
                 prg_sequence = get_PRG_sequence(line)
                 new_prg.write(">" + gene + "\n")
                 new_prg.write(prg_sequence + "\n")
+
+
+def get_number_of_sequences_in_fasta(fasta_filepath: str) -> int:
+    with open(fasta_filepath) as fasta_filehandler:
+        number_of_sequences_in_fasta = sum([1 for line in fasta_filehandler if line.startswith(">")])
+        return number_of_sequences_in_fasta

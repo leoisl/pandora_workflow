@@ -52,3 +52,5 @@ rule all:
          output_files
 
 include: "rules/get_denovo_updated_prg.smk"
+
+localrules: get_appended_msa_to_run_clustalo

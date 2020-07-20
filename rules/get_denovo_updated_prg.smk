@@ -78,14 +78,30 @@ rule aggregate_prgs_without_denovo_path:
             get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prgs_without_denovo_paths_fh, genes_without_denovo_paths)
 
 
-
-rule run_clustalo_after_adding_MSA_path:
+rule get_appended_msa_to_run_clustalo:
     input:
         map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]),
         msa = msas_dir + "/{clustering_tool}/{gene}.fa"
     output:
-        updated_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
         appended_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
+    threads: 1
+    resources:
+        mem_mb = 100
+    params:
+        denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
+                                                for map_with_discovery_dir in input.map_with_discovery_dirs],
+    log:
+        "logs/get_appended_msa_to_run_clustalo/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
+    script:
+        "../scripts/get_appended_msa_to_run_clustalo.py"
+
+
+
+rule run_clustalo_after_adding_MSA_path:
+    input:
+        appended_msa = rules.get_appended_msa_to_run_clustalo.output.appended_msa
+    output:
+        updated_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
         run_status =  analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas_run_status/{clustering_tool}/{gene}.status",
     threads: 1
     shadow: "shallow"
@@ -93,8 +109,6 @@ rule run_clustalo_after_adding_MSA_path:
         mem_mb = lambda wildcards, attempt: {1: 4000, 2: 8000, 3: 16000}.get(attempt, 32000)
     params:
         log_level = "DEBUG",
-        denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
-                                                for map_with_discovery_dir in input.map_with_discovery_dirs],
         clustalo_timeout_in_second = clustalo_timeout_in_second
     singularity: config["make_prg_dependencies_img"]
     log:
