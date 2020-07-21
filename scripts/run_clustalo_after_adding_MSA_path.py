@@ -22,14 +22,12 @@ def run_msa_after_adding_denovo_paths(
 ):
     try:
         logging.info("Running multiple sequence alignment.")
+        logging.info(f"Number of sequences: {get_number_of_sequences_in_fasta(appended_msa)}")
 
-        # printing to stdout so that this info is with LSF runtime stats
-        print(f"Number of sequences: {get_number_of_sequences_in_fasta(appended_msa)}")
-
-        subprocess.check_call(
+        time_spent = run_command_and_time_it(
             ["clustalo", "--dealign", "--threads", str(threads), "--in", appended_msa, "--out", updated_msa],
-            timeout=timeout_in_seconds
-        )
+            timeout_in_seconds)
+        logging.info(f"Time in seconds: {time_spent}")
         run_status_fh.write("SUCCESS\n")
         logging.info("Multiple sequence alignment finished.")
     except subprocess.TimeoutExpired:

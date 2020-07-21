@@ -31,8 +31,7 @@ def build_prg_after_adding_denovo_paths(
     run_status_fh: TextIO,
     clustalo_run_was_ok: bool
 ):
-    # printing to stdout so that this info is with LSF runtime stats
-    print(f"Number of sequences: {get_number_of_sequences_in_fasta(msa)}")
+    logging.info(f"Number of sequences: {get_number_of_sequences_in_fasta(msa)}")
 
     if not clustalo_run_was_ok:
         with original_prg.open() as original_prg_fh:
@@ -42,10 +41,11 @@ def build_prg_after_adding_denovo_paths(
 
     try:
         logging.info("Building PRG for MSA.")
-        subprocess.check_call(
+
+        time_spent = run_command_and_time_it(
             ["python3", make_prg_script, "-v", "--max_nesting", str(max_nesting_lvl), "--prefix", prefix, msa],
-            timeout=timeout_in_seconds
-        )
+            timeout_in_seconds)
+        logging.info(f"Time in seconds: {time_spent}")
         logging.info("Finished building PRG.")
 
         #  Adding header info to PRG and renaming to correct filepath

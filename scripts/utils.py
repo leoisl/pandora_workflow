@@ -1,4 +1,6 @@
 from typing import TextIO, List
+from datetime import datetime
+import subprocess
 
 def get_technology_param(wildcards):
     if wildcards.technology=="illumina":
@@ -40,3 +42,11 @@ def get_number_of_sequences_in_fasta(fasta_filepath: str) -> int:
     with open(fasta_filepath) as fasta_filehandler:
         number_of_sequences_in_fasta = sum([1 for line in fasta_filehandler if line.startswith(">")])
         return number_of_sequences_in_fasta
+
+
+def run_command_and_time_it(list_of_command_and_args, timeout_in_seconds=None):
+    before = datetime.now()
+    subprocess.check_call(list_of_command_and_args, timeout=timeout_in_seconds)
+    after = datetime.now()
+    time_spent_in_command = after - before
+    return time_spent_in_command.total_seconds()
