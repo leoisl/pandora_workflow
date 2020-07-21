@@ -88,6 +88,7 @@ rule get_appended_msa_to_run_clustalo:
     resources:
         mem_mb = 100
     params:
+        log_level = "DEBUG",
         denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
                                                 for map_with_discovery_dir in input.map_with_discovery_dirs],
     log:
