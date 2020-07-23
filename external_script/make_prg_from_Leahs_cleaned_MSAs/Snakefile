@@ -59,7 +59,7 @@ rule make_msas_csv:
         msas_csv = output_dir + "/msas/msas.csv"
     threads: 1
     resources:
-        mem_mb = 100
+        mem_mb = 4000
     log:
         "logs/make_msas_csv.log"
     run:
@@ -121,7 +121,7 @@ rule aggregate_prgs:
         prg = output_dir + "/prgs/prg.fa"
     threads: 1
     resources:
-        mem_mb = lambda wildcards, attempt: 2000 * attempt
+        mem_mb = lambda wildcards, attempt: 4000 * attempt
     log:
         "logs/aggregate_prgs.log"
     run:
