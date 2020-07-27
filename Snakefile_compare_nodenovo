@@ -47,4 +47,4 @@ rule all:
     input:
          output_files
 
-include: "rules/compare.smk"
+include: "rules/compare_nodenovo.smk"
