@@ -3,6 +3,7 @@ set -eux
 JOB_NAME="snakemake_master_process."$(date --iso-8601='minutes')
 LOG_DIR=logs/
 MEMORY=4000
+PROFILE="lsf"
 
 mkdir -p "$LOG_DIR"
 bsub -R "select[mem>$MEMORY] rusage[mem=$MEMORY] span[hosts=1]" \
