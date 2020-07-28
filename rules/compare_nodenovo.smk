@@ -31,7 +31,7 @@ rule compare_nodenovo:
     output:
         vcf=    analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_nodenovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped_{genotyping_mode}.vcf",
         vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_nodenovo_{genotyping_mode}_genotyping/pandora_multisample.vcf_ref.fa",
-    threads: 54
+    threads: 110
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 50000
     params:

@@ -18,10 +18,7 @@ configfile: "config.yaml"
 # Variables
 # ======================================================
 sample_data_dir = config["sample_data_dir"]
-msas_dir = config["msas_dir"]
-prgs_dir = config["prgs_dir"]
 analysis_output_dir = config["analysis_output_dir"]
-msas_csv = config["msas_csv"]
 samples = config["samples"]
 
 
@@ -32,7 +29,6 @@ for technology, sample, coverage, strategy in itertools.product(
                                                     config["coverages"],
                                                     config["subsample"]["strategies"]):
     output_files.extend([
-        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_nodenovo_local_genotyping/pandora_multisample_genotyped_local.vcf",
         f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/compare_nodenovo_global_genotyping/pandora_multisample_genotyped_global.vcf",
     ])
 
