@@ -11,7 +11,7 @@ rule subsample_nanopore:
     threads: 1
     resources:
         mem_mb=lambda wildcards, attempt: 1000 * attempt
-    singularity: config["subsample"]["container"]
+    singularity: config["container"]
     log:
         "logs/subsample/{sub_strategy}/nanopore.{sample}.{coverage}x.log"
     shell:
@@ -103,12 +103,11 @@ rule index_original_prg:
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 16000
-    params:
-        pandora=config["pandora_executable"],
     log:
         "logs/index_original_prg.log"
+    singularity: config["container"]
     shell:
-        "{params.pandora} index -t {threads} {input} > {log} 2>&1"
+        "pandora index -t {threads} {input} > {log} 2>&1"
 
 
 rule map_with_discovery:
@@ -123,14 +122,14 @@ rule map_with_discovery:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000,
     params:
-        pandora=config["pandora_executable"],
         log_level="info",
         use_discover=True,
     log:
         "logs/map_with_discovery/{technology}/{coverage}x/{sub_strategy}/{sample}.log"
+    singularity: config["container"]
     shell:
         """
-        bash scripts/pandora_map.sh {params.pandora} {input.prg} \
+        bash scripts/pandora_map.sh pandora {input.prg} \
             {input.reads} \
             {output.outdir} \
             {threads} \

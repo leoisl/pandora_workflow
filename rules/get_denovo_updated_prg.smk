@@ -111,7 +111,7 @@ rule run_clustalo_after_adding_MSA_path:
     params:
         log_level = "DEBUG",
         clustalo_timeout_in_second = clustalo_timeout_in_second
-    singularity: config["make_prg_dependencies_img"]
+    singularity: config["container"]
     log:
         "logs/run_clustalo_after_adding_MSA_path/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
     script:
@@ -138,7 +138,7 @@ rule run_make_prg:
         make_prg_timeout_in_second = make_prg_timeout_in_second,
         make_prg_memory_limit = make_prg_memory_limit,
         mem_mb = lambda wildcards, resources: resources.mem_mb
-    singularity: config["make_prg_dependencies_img"]
+    singularity: config["container"]
     log:
         "logs/run_make_prg/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
     script:

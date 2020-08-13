@@ -11,12 +11,11 @@ rule index_prg_updated_with_denovo_paths:
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 16000
-    params:
-        pandora=config["pandora_executable"],
+    singularity: config["container"]
     log:
         "logs/index_prg_updated_with_denovo_paths/{technology}/{coverage}x/{sub_strategy}.log"
     shell:
-        "{params.pandora} index -t {threads} {input} > {log} 2>&1"
+        "pandora index -t {threads} {input} > {log} 2>&1"
 
 
 rule create_tsv_for_reads:
@@ -52,15 +51,15 @@ rule compare_withdenovo:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000
     params:
-        pandora=config["pandora_executable"],
         log_level="info",
         outdir=lambda wildcards, output: str(Path(output.vcf).parent),
         technology_param = lambda wildcards: get_technology_param(wildcards)
     log:
         "logs/compare_withdenovo/{technology}/{coverage}x/{sub_strategy}/{genotyping_mode}.log"
+    singularity: config["container"]
     shell:
         """
-        {params.pandora} compare --prg_file {input.prg} \
+            pandora compare --prg_file {input.prg} \
             --read_index {input.read_index} \
             --outdir {params.outdir} \
             -t {threads} \
@@ -83,15 +82,15 @@ rule compare_nodenovo:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000
     params:
-        pandora=config["pandora_executable"],
         log_level="info",
         outdir=lambda wildcards, output: str(Path(output.vcf).parent),
         technology_param = lambda wildcards: get_technology_param(wildcards)
     log:
         "logs/compare_nodenovo/{technology}/{coverage}x/{sub_strategy}/{genotyping_mode}.log"
+    singularity: config["container"]
     shell:
         """
-        {params.pandora} compare \
+            pandora compare \
             --prg_file {input.prg} \
             --read_index {input.read_index} \
             --outdir {params.outdir} \
