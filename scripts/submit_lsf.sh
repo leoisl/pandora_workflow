@@ -12,5 +12,5 @@ bsub -R "select[mem>$MEMORY] rusage[mem=$MEMORY] span[hosts=1]" \
     -o "$LOG_DIR"/"$JOB_NAME".o \
     -e "$LOG_DIR"/"$JOB_NAME".e \
     -J "$JOB_NAME" \
-      bash scripts/run_pipeline.sh "$@"
+      bash scripts/run_pipeline_lsf.sh "$@"
 
