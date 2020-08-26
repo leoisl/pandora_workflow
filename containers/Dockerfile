@@ -1,12 +1,10 @@
 # If you want to use this container, it is simpler to just pull it:
 #   docker pull leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
 
-# This container has pandora, make_prg_dependencies and subsampling software to be used by the pandora_analysis_pipeline
-# to build: sudo docker build . -t pandora_analysis_pipeline:pandora_paper_tag1
+# This container has pandora and make_prg_dependencies to be used by the pandora_analysis_pipeline
+# to build: sudo docker build . -t leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
 FROM ubuntu:bionic
 
-ARG filtlong_version="0.2.0"
-ARG rasusa_version="0.1.0"
 ARG pandora_version="pandora_paper_tag1"
 
 ENV LANG C.UTF-8
@@ -18,22 +16,6 @@ RUN apt update && \
     apt-add-repository universe && \
     apt update && \
     apt install -y git wget build-essential zlib1g-dev python3 python3-pip cmake
-
-
-# ================================
-# INSTALL filtlong
-# ================================
-RUN wget -O - "https://github.com/rrwick/Filtlong/archive/v${filtlong_version}.tar.gz" | tar xzf - && \
-    cd Filtlong-${filtlong_version} && \
-    make -j4
-ENV PATH="/Filtlong-${filtlong_version}/bin:${PATH}"
-
-
-# ================================
-# INSTALL rasusa
-# ================================
-RUN wget "https://github.com/mbhall88/rasusa/releases/download/${rasusa_version}/rasusa-${rasusa_version}-x86_64-unknown-linux-musl.tar.gz" -O - | tar -xzf - && \
-    mv rasusa /usr/bin/
 
 
 # ========================
