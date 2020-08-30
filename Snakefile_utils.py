@@ -35,7 +35,7 @@ def setup_global_vars(config):
     output_folder = config['output_folder']
     original_prg = config['original_prg']
     coverages = config["coverages"]
-    subsamplings = config["subsampling"]
+    subsamplings = config["subsamplings"]
     technologies = config["technologies"]
 
     samples_csv = config["samples"]
