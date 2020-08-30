@@ -2,7 +2,6 @@ from pathlib import Path
 import pandas as pd
 import fileinput
 from scripts.utils import *
-from Snakefile_utils import *
 
 def get_genes_with_denovo_paths(output_folder, technology, coverage, sub_strategy, samples):
     denovo_dirs = [f"{output_folder}/{technology}/{coverage}x/{sub_strategy}/{sample}/map_with_discovery/denovo_paths" for sample in samples]

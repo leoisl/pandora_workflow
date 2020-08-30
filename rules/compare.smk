@@ -1,6 +1,5 @@
 from pathlib import Path
 from scripts.utils import get_technology_param
-from Snakefile_utils import *
 
 rule index_prg_updated_with_denovo_paths:
     input:

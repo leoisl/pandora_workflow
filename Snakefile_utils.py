@@ -8,11 +8,10 @@ def update_to_absolute_path(df, columns):
         df[column] = update_to_absolute_path_core(df[column])
     return df
 
-def get_illumina_reads(subsampled_reads, sample_name, first_or_second, subsampling, coverage):
-    assert first_or_second in [1, 2]
-    assert sample_name in subsampled_reads.sample_id.to_list()
-    sample_path = subsampled_reads[subsampled_reads.sample_id == sample_name]["sample_path"].tolist()[0]
-    return f"{sample_path}/{sample_name}.{coverage}x.{subsampling}.illumina.{first_or_second}.fastq"
+def get_reads(subsampled_reads, technology, sample, coverage, sub_strategy):
+    assert sample in subsampled_reads.sample_id.to_list()
+    sample_path = subsampled_reads[subsampled_reads.sample_id == sample]["sample_path"].tolist()[0]
+    return f"{sample_path}/{sample}.{coverage}x.{sub_strategy}.{technology}.fastq"
 
 def get_nanopore_reads(subsampled_reads, sample_name, subsampling, coverage):
     assert sample_name in subsampled_reads.sample_id.to_list()
