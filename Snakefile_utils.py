@@ -10,7 +10,7 @@ def update_to_absolute_path(df, columns):
 
 def get_reads(subsampled_reads, technology, sample, coverage, sub_strategy):
     assert sample in subsampled_reads.sample_id.to_list()
-    sample_path = subsampled_reads[subsampled_reads.sample_id == sample]["sample_path"].tolist()[0]
+    sample_path = subsampled_reads[subsampled_reads.sample_id == sample]["subsampled_reads_dir"].tolist()[0]
     return f"{sample_path}/{sample}.{coverage}x.{sub_strategy}.{technology}.fastq"
 
 def get_nanopore_reads(subsampled_reads, sample_name, subsampling, coverage):
