@@ -2,6 +2,8 @@ import itertools
 from Snakefile_utils import *
 
 configfile: "config.yaml"
+global output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
+            make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas, subsampled_reads
 setup_global_vars(config)
 
 output_files = []
