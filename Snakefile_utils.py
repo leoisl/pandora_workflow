@@ -29,9 +29,7 @@ def get_assembly(samples_df, sample_name):
     sample_path = samples_df[samples_df.sample_id == sample_name]["sample_path"].tolist()[0]
     return f"{sample_path}/{sample_name}.ref.fa"
 
-def setup_global_vars(config):
-    global output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
-            make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas, subsampled_reads
+def get_config_vars(config):
     output_folder = config['output_folder']
     original_prg = config['original_prg']
     coverages = config["coverages"]
@@ -56,3 +54,6 @@ def setup_global_vars(config):
     clustalo_timeout_in_second = int(config["clustalo_timeout_in_second"])
 
     pandora_container = config["pandora_container"]
+
+    return output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
+            make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas, subsampled_reads

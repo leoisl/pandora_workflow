@@ -2,10 +2,11 @@ import itertools
 from Snakefile_utils import *
 
 configfile: "config.yaml"
-output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
-make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas, subsampled_reads = [None]*13
 
-setup_global_vars(config)
+# setup global vars
+output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
+make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas, subsampled_reads = \
+get_config_vars(config)
 
 output_files = []
 for technology, sample, coverage, subsampling in itertools.product(
