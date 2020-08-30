@@ -12,22 +12,27 @@ ENV LC_ALL C.UTF-8
 
 # install basic dependencies
 RUN apt update && \
-    apt install -y software-properties-common && \
+    apt install -y software-properties-common=0.96.24.32.14 && \
     apt-add-repository universe && \
     apt update && \
-    apt install -y git wget build-essential zlib1g-dev python3 python3-pip cmake
+    apt install -y git wget \
+        build-essential=12.4ubuntu1 \
+        zlib1g-dev=1:1.2.11.dfsg-0ubuntu2 \
+        python3=3.6.7-1~18.04 \
+        python3-pip=9.0.1-2.3~ubuntu1.18.04.2 \
+        cmake=3.10.2-1ubuntu2.18.04.1
 
 
 # ========================
 # INSTALL clustal omega
 # ========================
-RUN apt install -y clustalo
+RUN apt install -y clustalo=1.2.4-1
 
 
 # ========================
 # INSTALL make_prg dependencies
 # ========================
-RUN pip3 install biopython==1.72 numpy==1.14.5 scikit-learn==0.20.3 snakemake && \
+RUN pip3 install biopython==1.72 numpy==1.14.5 scikit-learn==0.20.3 snakemake==5.23.0 && \
     cp /usr/bin/python3 /usr/bin/python
 
 
