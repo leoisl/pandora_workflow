@@ -14,7 +14,7 @@ rule index_original_prg:
     shell:
         """
         ln -s {input.prg} {output.linked_prg}
-        pandora index -t {threads} {input.prg} >{log} 2>&1
+        pandora index -t {threads} {output.linked_prg} >{log} 2>&1
         """
 
 
