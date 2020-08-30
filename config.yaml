@@ -17,6 +17,7 @@ technologies:
 samples: metadata/samples_pandora_paper_tag1.csv
 subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.csv
 
+msas_dir: ../data/msas
 msas_csv: metadata/msas_pandora_paper_tag1.csv
 
 # time and memory limits

@@ -44,6 +44,7 @@ def get_config_vars(config):
     subsampled_reads = pd.read_csv(subsampled_reads_dir)
     subsampled_reads = update_to_absolute_path(subsampled_reads, ["subsampled_reads_dir"])
 
+    msas_dir = config["msas_dir"]
     msas_csv = config["msas_csv"]
     msas = pd.read_csv(msas_csv)
     msas = update_to_absolute_path(msas, ["msa"])
@@ -55,4 +56,4 @@ def get_config_vars(config):
     pandora_container = config["pandora_container"]
 
     return output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
-            make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas, subsampled_reads
+            make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas_dir, msas, subsampled_reads
