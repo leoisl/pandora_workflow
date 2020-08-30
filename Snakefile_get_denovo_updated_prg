@@ -1,45 +1,20 @@
-from pathlib import Path
 import itertools
-from snakemake.utils import min_version
+from Snakefile_utils import *
 
-min_version("5.4.0")
-
-# ======================================================
-# Config files
-# ======================================================
 configfile: "config.yaml"
-
-# ======================================================
-# Functions
-# ======================================================
-
-
-# ======================================================
-# Variables
-# ======================================================
-sample_data_dir = config["sample_data_dir"]
-msas_dir = config["msas_dir"]
-prgs_dir = config["prgs_dir"]
-analysis_output_dir = config["analysis_output_dir"]
-msas_csv = config["msas_csv"]
-samples = config["samples"]
-make_prg_timeout_in_second = int(config["make_prg_timeout_in_second"])
-make_prg_memory_limit = int(config["make_prg_memory_limit"])
-clustalo_timeout_in_second = int(config["clustalo_timeout_in_second"])
-
+setup_global_vars(config)
 
 output_files = []
-for technology, sample, coverage, strategy in itertools.product(
-                                                    config["technologies"],
-                                                    config["samples"],
-                                                    config["coverages"],
-                                                    config["subsample"]["strategies"]):
+for technology, sample, coverage, subsampling in itertools.product(
+                                                    technologies,
+                                                    samples,
+                                                    coverages,
+                                                    subsamplings):
     output_files.extend([
-        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/prgs/denovo_updated.prg.fa",
-        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/all_msas_run_status.txt",
-        f"{analysis_output_dir}/{technology}/{coverage}x/{strategy}/all_prgs_run_status.txt",
+        f"{output_folder}/{technology}/{coverage}x/{subsampling}/prgs/denovo_updated.prg.fa",
+        f"{output_folder}/{technology}/{coverage}x/{subsampling}/all_msas_run_status.txt",
+        f"{output_folder}/{technology}/{coverage}x/{subsampling}/all_prgs_run_status.txt",
     ])
-
 
 # deduplicate
 output_files = list(set(output_files))
@@ -52,5 +27,3 @@ rule all:
          output_files
 
 include: "rules/get_denovo_updated_prg.smk"
-
-localrules: get_appended_msa_to_run_clustalo

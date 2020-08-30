@@ -4,8 +4,8 @@ import fileinput
 from scripts.utils import *
 
 
-def get_genes_with_denovo_paths(analysis_output_dir, technology, coverage, sub_strategy, samples):
-    denovo_dirs = [f"{analysis_output_dir}/{technology}/{coverage}x/{sub_strategy}/{sample}/map_with_discovery/denovo_paths" for sample in samples]
+def get_genes_with_denovo_paths(output_folder, technology, coverage, sub_strategy, samples):
+    denovo_dirs = [f"{output_folder}/{technology}/{coverage}x/{sub_strategy}/{sample}/map_with_discovery/denovo_paths" for sample in samples]
     denovo_dirs = [Path(denovo_dir) for denovo_dir in denovo_dirs]
     genes = set()
     for denovo_dir in denovo_dirs:
@@ -15,8 +15,9 @@ def get_genes_with_denovo_paths(analysis_output_dir, technology, coverage, sub_s
     return genes
 
 
-def get_genes_without_denovo_paths(genes_with_denovo_paths, msas_csv):
-    msa_paths_as_str = pd.read_csv(msas_csv)["msas_absolute_paths"]
+def get_genes_without_denovo_paths(output_folder, technology, coverage, sub_strategy, samples):
+    genes_with_denovo_paths = get_genes_with_denovo_paths(output_folder, technology, coverage, sub_strategy, samples)
+    msa_paths_as_str = pd.read_csv(msas_csv)["msa"]
     msa_paths = [Path(msa_path_as_str) for msa_path_as_str in msa_paths_as_str]
     all_genes = {p.name.replace(".fa", "") for p in msa_paths}
     assert len(msa_paths) == len(all_genes)
@@ -25,65 +26,64 @@ def get_genes_without_denovo_paths(genes_with_denovo_paths, msas_csv):
 
 
 def aggregate_prgs_with_denovo_path_input(wildcards):
-    genes_with_denovo_paths = get_genes_with_denovo_paths(analysis_output_dir, wildcards.technology, wildcards.coverage,
+    genes_with_denovo_paths = get_genes_with_denovo_paths(output_folder, wildcards.technology, wildcards.coverage,
                                                           wildcards.sub_strategy, samples)
     input_files = []
     for gene in genes_with_denovo_paths:
         tool = "custom"
         input_files.append(
-            f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs/{tool}/{gene}.prg.fa"
+            f"{output_folder}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs/{tool}/{gene}.prg.fa"
         )
     return input_files
 
 def aggregate_msas_status_input_files(wildcards):
-    genes_with_denovo_paths = get_genes_with_denovo_paths(analysis_output_dir, wildcards.technology, wildcards.coverage,
+    genes_with_denovo_paths = get_genes_with_denovo_paths(output_folder, wildcards.technology, wildcards.coverage,
                                                           wildcards.sub_strategy, samples)
     input_files = []
     for gene in genes_with_denovo_paths:
         tool = "custom"
         input_files.append(
-            f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/msas_run_status/{tool}/{gene}.status"
+            f"{output_folder}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/msas_run_status/{tool}/{gene}.status"
         )
     return input_files
 
 def aggregate_prgs_status_input_files(wildcards):
-    genes_with_denovo_paths = get_genes_with_denovo_paths(analysis_output_dir, wildcards.technology, wildcards.coverage,
+    genes_with_denovo_paths = get_genes_with_denovo_paths(output_folder, wildcards.technology, wildcards.coverage,
                                                           wildcards.sub_strategy, samples)
     input_files = []
     for gene in genes_with_denovo_paths:
         tool = "custom"
         input_files.append(
-            f"{analysis_output_dir}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs_run_status/{tool}/{gene}.status"
+            f"{output_folder}/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/prgs_run_status/{tool}/{gene}.status"
         )
     return input_files
 
 
 rule aggregate_prgs_without_denovo_path:
     input:
-        map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"])
+        map_with_discovery_dirs = expand(output_folder+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=samples)
     output:
-        prgs_without_denovo_paths = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prgs_without_denovo_paths.fa",
+        prgs_without_denovo_paths = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prgs_without_denovo_paths.fa",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
     params:
-        original_prg = config["original_prg"]
+        original_prg = original_prg
     log:
         "logs/aggregate_prgs_without_denovo_path/{technology}/{coverage}x/{sub_strategy}/.log"
     run:
-        genes_with_denovo_paths = get_genes_with_denovo_paths(analysis_output_dir, wildcards.technology, wildcards.coverage,
-                                                          wildcards.sub_strategy, samples)
-        genes_without_denovo_paths = get_genes_without_denovo_paths(genes_with_denovo_paths, msas_csv)
+        genes_without_denovo_paths = get_genes_without_denovo_paths(output_folder, wildcards.technology,
+                                                                    wildcards.coverage, wildcards.sub_strategy, samples)
         with open(params.original_prg) as original_prg_fh, open(output.prgs_without_denovo_paths, "w") as prgs_without_denovo_paths_fh:
             get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prgs_without_denovo_paths_fh, genes_without_denovo_paths)
 
 
 rule get_appended_msa_to_run_clustalo:
     input:
-        map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]),
+        map_with_discovery_dirs = expand(output_folder+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=samples),
         msa = msas_dir + "/{clustering_tool}/{gene}.fa"
     output:
-        appended_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
+        appended_msa = output_folder+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
     threads: 1
     resources:
         mem_mb = 100
@@ -95,15 +95,15 @@ rule get_appended_msa_to_run_clustalo:
         "logs/get_appended_msa_to_run_clustalo/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
     script:
         "../scripts/get_appended_msa_to_run_clustalo.py"
-
+localrules: get_appended_msa_to_run_clustalo
 
 
 rule run_clustalo_after_adding_MSA_path:
     input:
         appended_msa = rules.get_appended_msa_to_run_clustalo.output.appended_msa
     output:
-        updated_msa = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
-        run_status =  analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/msas_run_status/{clustering_tool}/{gene}.status",
+        updated_msa = output_folder+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
+        run_status =  output_folder+"/{technology}/{coverage}x/{sub_strategy}/msas_run_status/{clustering_tool}/{gene}.status",
     threads: 1
     shadow: "shallow"
     resources:
@@ -111,7 +111,7 @@ rule run_clustalo_after_adding_MSA_path:
     params:
         log_level = "DEBUG",
         clustalo_timeout_in_second = clustalo_timeout_in_second
-    singularity: config["container"]
+    singularity: pandora_container
     log:
         "logs/run_clustalo_after_adding_MSA_path/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
     script:
@@ -123,8 +123,8 @@ rule run_make_prg:
         updated_msa = rules.run_clustalo_after_adding_MSA_path.output.updated_msa,
         clustalo_run_status = rules.run_clustalo_after_adding_MSA_path.output.run_status,
     output:
-        prg = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa",
-        run_status =  analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs_run_status/{clustering_tool}/{gene}.status",
+        prg = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa",
+        run_status =  output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs_run_status/{clustering_tool}/{gene}.status",
     threads: 1
     shadow: "shallow"
     resources:
@@ -134,11 +134,11 @@ rule run_make_prg:
         make_prg_script = "scripts/make_prg_from_msa.py",
         max_nesting_lvl = config.get("max_nesting_lvl", 5),
         prefix = lambda wildcards, output: output.prg.replace("".join(Path(output.prg).suffixes), ""),
-        original_prg = config["original_prg"],
+        original_prg = original_prg,
         make_prg_timeout_in_second = make_prg_timeout_in_second,
         make_prg_memory_limit = make_prg_memory_limit,
         mem_mb = lambda wildcards, resources: resources.mem_mb
-    singularity: config["container"]
+    singularity: pandora_container
     log:
         "logs/run_make_prg/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
     script:
@@ -157,10 +157,10 @@ def concatenate_several_prgs_into_one(input_prgs, output_prg):
 
 rule aggregate_prgs_with_denovo_path:
     input:
-        map_with_discovery_dirs = expand(analysis_output_dir+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=config["samples"]),
+        map_with_discovery_dirs = expand(output_folder+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=samples),
         prgs = aggregate_prgs_with_denovo_path_input,
     output:
-        prgs_with_denovo_paths = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prgs_with_denovo_paths.fa",
+        prgs_with_denovo_paths = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prgs_with_denovo_paths.fa",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
@@ -183,7 +183,7 @@ rule aggregate_msas_run_status:
     input:
         all_msas_status = aggregate_msas_status_input_files
     output:
-        aggregated_msas_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_msas_run_status.txt",
+        aggregated_msas_status = output_folder+"/{technology}/{coverage}x/{sub_strategy}/all_msas_run_status.txt",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
@@ -197,7 +197,7 @@ rule aggregate_prgs_run_status:
     input:
         all_prgs_status = aggregate_prgs_status_input_files
     output:
-        aggregated_prgs_status = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/all_prgs_run_status.txt",
+        aggregated_prgs_status = output_folder+"/{technology}/{coverage}x/{sub_strategy}/all_prgs_run_status.txt",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
@@ -212,14 +212,14 @@ rule aggregate_prgs:
         prgs_with_denovo_paths = rules.aggregate_prgs_with_denovo_path.output.prgs_with_denovo_paths,
         prgs_without_denovo_paths = rules.aggregate_prgs_without_denovo_path.output.prgs_without_denovo_paths
     output:
-        prg = analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
+        prg = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
     threads: 1
     resources:
         mem_mb = lambda wildcards, attempt: 2000 * attempt
     log:
         "logs/aggregate_prgs/{technology}/{coverage}x/{sub_strategy}/.log"
     params:
-        original_prg = config["original_prg"]
+        original_prg = original_prg
     run:
         concatenate_several_prgs_into_one([input.prgs_with_denovo_paths, input.prgs_without_denovo_paths],
                                           output.prg)

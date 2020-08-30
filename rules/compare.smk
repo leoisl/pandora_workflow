@@ -4,14 +4,14 @@ from scripts.utils import get_technology_param
 
 rule index_prg_updated_with_denovo_paths:
     input:
-        analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
+        output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
     output:
-        index=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa.k15.w14.idx",
-        kmer_prgs=directory(analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/kmer_prgs"),
+        index=output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa.k15.w14.idx",
+        kmer_prgs=directory(output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/kmer_prgs"),
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 16000
-    singularity: config["container"]
+    singularity: pandora_container
     log:
         "logs/index_prg_updated_with_denovo_paths/{technology}/{coverage}x/{sub_strategy}.log"
     shell:
@@ -20,9 +20,9 @@ rule index_prg_updated_with_denovo_paths:
 
 rule create_tsv_for_reads:
     input:
-        expand(sample_data_dir + "/{sample}/{sample}.{{coverage}}x.{{sub_strategy}}.{{technology}}.fastq", sample=config["samples"])
+        expand(sample_data_dir + "/{sample}/{sample}.{{coverage}}x.{{sub_strategy}}.{{technology}}.fastq", sample=samples)
     output:
-        tsv = sample_data_dir + "/samples.{coverage}x.{sub_strategy}.{technology}.tsv"
+        tsv = output_folder+"/{technology}/{coverage}x/{sub_strategy}/reads.tsv"
     threads: 1
     resources:
         mem_mb=200
@@ -42,11 +42,11 @@ rule create_tsv_for_reads:
 rule compare_withdenovo:
     input:
         read_index=rules.create_tsv_for_reads.output.tsv,
-        prg=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
+        prg=output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prg.fa",
         prg_index=rules.index_prg_updated_with_denovo_paths.output.index,
     output:
-        vcf=    analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_withdenovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped_{genotyping_mode}.vcf",
-        vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_withdenovo_{genotyping_mode}_genotyping/pandora_multisample.vcf_ref.fa",
+        vcf=    output_folder+"/{technology}/{coverage}x/{sub_strategy}/compare_withdenovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped_{genotyping_mode}.vcf",
+        vcf_ref=output_folder+"/{technology}/{coverage}x/{sub_strategy}/compare_withdenovo_{genotyping_mode}_genotyping/pandora_multisample.vcf_ref.fa",
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000
@@ -56,7 +56,7 @@ rule compare_withdenovo:
         technology_param = lambda wildcards: get_technology_param(wildcards)
     log:
         "logs/compare_withdenovo/{technology}/{coverage}x/{sub_strategy}/{genotyping_mode}.log"
-    singularity: config["container"]
+    singularity: pandora_container
     shell:
         """
             pandora compare --prg_file {input.prg} \
@@ -72,12 +72,12 @@ rule compare_withdenovo:
 
 rule compare_nodenovo:
     input:
-        read_index=rules.create_tsv_for_reads.output.tsv,
-        prg=config["original_prg"],
-        prg_index=config["original_prg"] + ".k15.w14.idx",
+        read_index = rules.create_tsv_for_reads.output.tsv,
+        prg = output_folder + "/prgs/prg.fa",
+        prg_index = output_folder + "/prgs/prg.fa.k15.w14.idx",
     output:
-        vcf=    analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_nodenovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped_{genotyping_mode}.vcf",
-        vcf_ref=analysis_output_dir+"/{technology}/{coverage}x/{sub_strategy}/compare_nodenovo_{genotyping_mode}_genotyping/pandora_multisample.vcf_ref.fa",
+        vcf=    output_folder+"/{technology}/{coverage}x/{sub_strategy}/compare_nodenovo_{genotyping_mode}_genotyping/pandora_multisample_genotyped_{genotyping_mode}.vcf",
+        vcf_ref=output_folder+"/{technology}/{coverage}x/{sub_strategy}/compare_nodenovo_{genotyping_mode}_genotyping/pandora_multisample.vcf_ref.fa",
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000
@@ -87,7 +87,7 @@ rule compare_nodenovo:
         technology_param = lambda wildcards: get_technology_param(wildcards)
     log:
         "logs/compare_nodenovo/{technology}/{coverage}x/{sub_strategy}/{genotyping_mode}.log"
-    singularity: config["container"]
+    singularity: pandora_container
     shell:
         """
             pandora compare \
