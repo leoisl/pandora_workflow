@@ -13,8 +13,7 @@ rule index_original_prg:
     singularity: pandora_container
     shell:
         """
-        mkdir -p {output_folder}/prgs
-        ln -s {input.prg} {output.linked_prg}
+        cp {input.prg} {output.linked_prg}
         pandora index -t {threads} {output.linked_prg} >{log} 2>&1
         """
 
