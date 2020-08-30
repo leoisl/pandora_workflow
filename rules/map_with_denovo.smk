@@ -1,3 +1,5 @@
+from Snakefile_utils import *
+
 rule index_original_prg:
     input:
         prg = original_prg
