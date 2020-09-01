@@ -16,7 +16,7 @@ def get_genes_with_denovo_paths(output_folder, technology, coverage, sub_strateg
 
 def get_genes_without_denovo_paths(output_folder, technology, coverage, sub_strategy, samples):
     genes_with_denovo_paths = get_genes_with_denovo_paths(output_folder, technology, coverage, sub_strategy, samples)
-    msa_paths_as_str = pd.read_csv(msas_csv)["msa"]
+    msa_paths_as_str = pd.read_csv(msas)["msa"]
     msa_paths = [Path(msa_path_as_str) for msa_path_as_str in msa_paths_as_str]
     all_genes = {p.name.replace(".fa", "") for p in msa_paths}
     assert len(msa_paths) == len(all_genes)
