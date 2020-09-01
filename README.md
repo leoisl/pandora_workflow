@@ -15,6 +15,13 @@ The version used in the pandora paper has tag `pandora_paper_tag1`.
 ### Setting up virtualenv
 `./setup.sh`
 
+## Running on the sample example:
+
+1. Download sample data (TODO: add link);
+2. `unzip sample_data.zip`
+3. `source venv/bin/activate`
+4. `bash scripts/run_pipeline_local.sh -j8`
+
 ## Running on the paper data:
 
 1. `git checkout pandora_paper_tag1`

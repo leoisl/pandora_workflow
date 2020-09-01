@@ -19,7 +19,7 @@ rule index_prg_updated_with_denovo_paths:
 
 rule create_tsv_for_reads:
     input:
-        expand(sample_data_dir + "/{sample}/{sample}.{{coverage}}x.{{sub_strategy}}.{{technology}}.fastq", sample=samples)
+        reads = lambda wildcards: [get_reads(subsampled_reads, wildcards.technology, sample, wildcards.coverage, wildcards.sub_strategy) for sample in samples],
     output:
         tsv = output_folder+"/{technology}/{coverage}x/{sub_strategy}/reads.tsv"
     threads: 1

@@ -1,0 +1,3 @@
+sample_id,subsampled_reads_dir
+063_STEC,sample_data/output_subsampler_small/063_STEC
+ST38,sample_data/output_subsampler_small//ST38

@@ -228,3 +228,8 @@ external_script/manual_curation_panx/genes_where_make_prg_took_10_GBs/
 external_script/build_input_for_26way/output/
 
 external_script/fix_genome_headers/output_genomes/
+/sample_data/
+/logs/
+/.snakemake/
+/pandora_output_small/
+/sample_data.zip

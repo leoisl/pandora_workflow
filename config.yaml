@@ -1,24 +1,21 @@
-output_folder: "pandora_output_pandora_paper_tag1"
-original_prg: "../data/prgs/ecoli_pangenome_PRG_210619.fa"
+output_folder: "pandora_output_small"
+original_prg: "sample_data/prgs/prg.fa"
 
 coverages:
-  # - 30
-  # - 60
-  - 100
+  - 10
 
 subsamplings:
-  # - filter
   - random
 
 technologies:
   - illumina
   - nanopore
 
-samples: metadata/samples_pandora_paper_tag1.csv
-subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.csv
+samples: metadata/samples_small.csv
+subsampled_reads_dir: metadata/subsampled_reads_small.csv
 
-msas_dir: ../data/msas
-msas_csv: metadata/msas_pandora_paper_tag1.csv
+msas_dir: sample_data/msas
+msas_csv: metadata/msas_small.csv
 
 # time and memory limits
 make_prg_timeout_in_second: 172800 # 2 days
