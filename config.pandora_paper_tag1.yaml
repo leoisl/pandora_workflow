@@ -1,1 +1,25 @@
-config.yaml
+output_folder: pandora_output
+original_prg: ../data/prgs/ecoli_pangenome_PRG_210619.fa
+
+coverages:
+  - 100
+
+subsamplings:
+  - random
+
+technologies:
+  - illumina
+  - nanopore
+
+samples: metadata/samples_pandora_paper_tag1.csv
+subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.csv
+
+msas_dir: ../data/msas
+msas_csv: metadata/msas_pandora_paper_tag1.csv
+
+# time and memory limits
+make_prg_timeout_in_second: 172800 # 2 days
+make_prg_memory_limit: 64000 # memory limit
+clustalo_timeout_in_second: 172800 # 2 days
+
+pandora_container: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
