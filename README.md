@@ -24,6 +24,11 @@ The version used in the pandora paper has tag `pandora_paper_tag1`.
 
 ## Running on the paper data:
 
+## WARNING
+
+`make_prg` memory limit on LSF clusters is recognised by killing the job with `KeyboardInterrupt`,
+so try to avoid killing jobs when running with `--snakefile Snakefile_get_denovo_updated_prg` as much as possible.
+
 1. `git checkout pandora_paper_tag1`
 2. `source venv/bin/activate`
 
