@@ -31,6 +31,8 @@ def get_assembly(samples_df, sample_name):
 def get_config_vars(config):
     output_folder = config['output_folder']
     original_prg = config['original_prg']
+    original_prg = str(Path(original_prg).absolute())
+
     coverages = config["coverages"]
     subsamplings = config["subsamplings"]
     technologies = config["technologies"]
