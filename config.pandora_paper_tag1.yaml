@@ -1,4 +1,4 @@
-output_folder: pandora_output
+output_folder: pandora_output_pandora_paper_tag1
 original_prg: ../data/prgs/ecoli_pangenome_PRG_210619.fa
 
 coverages:
