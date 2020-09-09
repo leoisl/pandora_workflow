@@ -23,3 +23,7 @@ make_prg_memory_limit: 64000 # memory limit
 clustalo_timeout_in_second: 172800 # 2 days
 
 pandora_container: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
+
+ignore_adding_denovo_paths_for_these_genes:
+  - GC00000027_2
+  - GC00004221

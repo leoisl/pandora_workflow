@@ -1,5 +1,4 @@
 from pathlib import Path
-import pandas as pd
 import fileinput
 from scripts.utils import *
 
@@ -109,7 +108,8 @@ rule run_clustalo_after_adding_MSA_path:
         mem_mb = lambda wildcards, attempt: {1: 4000, 2: 8000, 3: 16000}.get(attempt, 32000)
     params:
         log_level = "DEBUG",
-        clustalo_timeout_in_second = clustalo_timeout_in_second
+        clustalo_timeout_in_second = clustalo_timeout_in_second,
+        ignore_adding_denovo_paths_for_these_genes = ignore_adding_denovo_paths_for_these_genes
     singularity: pandora_container
     log:
         "logs/run_clustalo_after_adding_MSA_path/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"

@@ -55,5 +55,7 @@ def get_config_vars(config):
 
     pandora_container = config["pandora_container"]
 
+    ignore_adding_denovo_paths_for_these_genes = config["ignore_adding_denovo_paths_for_these_genes"]
+
     return output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
-            make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas_dir, msas, subsampled_reads
+            make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas_dir, msas, subsampled_reads, ignore_adding_denovo_paths_for_these_genes
