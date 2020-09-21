@@ -1,0 +1,5 @@
+sample_id,subsampled_reads_dir
+063_STEC_old_basecall,../subsampler/output_subsampler_pandora_paper_tag1_4way/063_STEC_old_basecall
+CFT073_old_basecall,../subsampler/output_subsampler_pandora_paper_tag1_4way/CFT073_old_basecall
+H131800734_old_basecall,../subsampler/output_subsampler_pandora_paper_tag1_4way/H131800734_old_basecall
+ST38_old_basecall,../subsampler/output_subsampler_pandora_paper_tag1_4way/ST38_old_basecall

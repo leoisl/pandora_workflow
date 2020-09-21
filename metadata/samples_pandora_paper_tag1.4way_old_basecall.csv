@@ -1,0 +1,5 @@
+sample_id,sample_path
+063_STEC_old_basecall,../data/samples/063_STEC_old_basecall
+CFT073_old_basecall,../data/samples/CFT073_old_basecall
+H131800734_old_basecall,../data/samples/H131800734_old_basecall
+ST38_old_basecall,../data/samples/ST38_old_basecall
