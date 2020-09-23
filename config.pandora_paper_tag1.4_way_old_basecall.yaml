@@ -26,3 +26,4 @@ pandora_container: docker://leandroishilima/pandora_analysis_pipeline:pandora_pa
 ignore_adding_denovo_paths_for_these_genes:
   - GC00000027_2
   - GC00004221
+  - GC00003300_r1_r1_r1_1
