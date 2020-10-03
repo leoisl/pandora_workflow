@@ -1,4 +1,4 @@
-output_folder: pandora_output_pandora_paper_tag1_performance_check_delete
+output_folder: pandora_output_pandora_paper_tag1_illumina_performance_check_delete
 original_prg: ../data/prgs/ecoli_pangenome_PRG_210619.fa
 
 coverages:
@@ -9,7 +9,6 @@ subsamplings:
 
 technologies:
   - illumina
-  - nanopore
 
 samples: metadata/samples_pandora_paper_tag1.csv
 subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.csv
