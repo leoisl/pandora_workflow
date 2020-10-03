@@ -1,0 +1,29 @@
+output_folder: pandora_output_pandora_paper_tag1_performance_check_delete
+original_prg: ../data/prgs/ecoli_pangenome_PRG_210619.fa
+
+coverages:
+  - 100
+
+subsamplings:
+  - random
+
+technologies:
+  - illumina
+  - nanopore
+
+samples: metadata/samples_pandora_paper_tag1.csv
+subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.csv
+
+msas_dir: ../data/msas
+msas_csv: metadata/msas_pandora_paper_tag1.csv
+
+# time and memory limits
+make_prg_timeout_in_second: 86400 # 1 days
+make_prg_memory_limit: 32000 # memory limit
+clustalo_timeout_in_second: 86400 # 1 days
+
+pandora_container: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
+
+ignore_adding_denovo_paths_for_these_genes:
+  - GC00000027_2
+  - GC00004221
