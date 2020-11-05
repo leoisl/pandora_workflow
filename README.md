@@ -1,4 +1,4 @@
-# Pandora analysis pipeline
+# Pandora workflow
 
 Snakemake pipeline to run pandora with and without denovo enabled.
 
