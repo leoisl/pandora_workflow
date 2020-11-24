@@ -76,7 +76,7 @@ rule aggregate_prgs_without_denovo_path:
             get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prgs_without_denovo_paths_fh, genes_without_denovo_paths)
 
 
-rule output_get_genes_with_denovo_paths:
+rule output_genes_with_denovo_paths:
     output:
         genes_with_denovo_paths_file = output_folder + "/{technology}/{coverage}x/{sub_strategy}/genes_with_denovo_paths.txt"
     threads: 1
@@ -89,14 +89,14 @@ rule output_get_genes_with_denovo_paths:
                                                               wildcards.sub_strategy, samples)
         with open(output.genes_with_denovo_paths_file, "w") as fout:
             print("\n".join(genes_with_denovo_paths), file=fout)
-localrules: output_get_genes_with_denovo_paths
+localrules: output_genes_with_denovo_paths
 
 
-rule update_msas:
+checkpoint update_msas:
     input:
         map_with_discovery_dirs = expand(output_folder+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=samples),
         msa_dir = msas_dir + "/{clustering_tool}",
-        gene_list = rules.output_get_genes_with_denovo_paths.output.genes_with_denovo_paths_file,
+        gene_list = rules.output_genes_with_denovo_paths.output.genes_with_denovo_paths_file,
     output:
         updated_msas=directory(
             output_folder+"/{technology}/{coverage}x/{sub_strategy}/updated_msas/{clustering_tool}",
@@ -117,15 +117,51 @@ rule update_msas:
         """
 
 
-rule run_make_prg:
+rule run_light_make_prg:
     input:
-        updated_msas = rules.update_msas.output.updated_msas,
+        MSAs = get_light_MSAs(rules.update_msas.output.updated_msas),
     output:
-        prg = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa",
-    threads: 1
-    shadow: "shallow"
+        prgs = directory(
+            output_folder+"/{technology}/{coverage}x/{sub_strategy}/light_prgs/{clustering_tool}"
+        ),
+        flag = output_folder+"/{technology}/{coverage}x/{sub_strategy}/light_prgs/{clustering_tool}_light_prgs_done",
+    threads: 16
     resources:
-        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 12000, 3: 32000}.get(attempt, 64000)
+        mem_mb = lambda wildcards, attempt: {1: 16000, 2: 32000, 3: 64000}.get(attempt, 128000)
+    params:
+        log_level = "DEBUG",
+        max_nesting_lvl = config.get("max_nesting_lvl", 5),
+        original_prg = original_prg,
+        extras="--no-ignore --hidden --show-errors",
+        extension="fa",
+        pattern=".",
+    singularity: make_prg_container
+    log:
+        "logs/run_light_make_prg/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/run_light_make_prg.log"
+    shell:
+        """
+        mkdir -p {output.prgs} 2> {log}
+        fd {params.extras} \
+            --extension {params.extension} \
+            --threads {threads} \
+            --exec sh make_prg '{{}}' \
+                {output.prgs}/'{{/.}}' \
+                {params.max_nesting_lvl} \
+                {log} \; \
+            {params.pattern} {input.MSAs} 2>> {log}
+        touch {output.flag}
+        """
+
+
+
+rule run_heavy_make_prg:
+    input:
+        updated_msa = output_folder+"/{technology}/{coverage}x/{sub_strategy}/updated_msas/{clustering_tool}/{gene}.fa"
+    output:
+        prg = output_folder+"/{technology}/{coverage}x/{sub_strategy}/heavy_prgs/{clustering_tool}/{gene}.prg.fa",
+    threads: 1
+    resources:
+        mem_mb = lambda wildcards, attempt: {1: 16000, 2: 32000, 3: 64000}.get(attempt, 128000)
     params:
         log_level = "DEBUG",
         max_nesting_lvl = config.get("max_nesting_lvl", 5),
@@ -133,9 +169,10 @@ rule run_make_prg:
         original_prg = original_prg,
     singularity: make_prg_container
     log:
-        "logs/run_make_prg/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
-    script:
-        "../scripts/run_make_prg.py"
+        "logs/run_heavy_make_prg/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
+    shell:
+        "make_prg from_msa --max_nesting {params.max_nesting_lvl} --prefix {params.prefix} {input.updated_msa}"
+
 
 
 def concatenate_several_prgs_into_one(input_prgs, output_prg):
@@ -151,7 +188,8 @@ def concatenate_several_prgs_into_one(input_prgs, output_prg):
 rule aggregate_prgs_with_denovo_path:
     input:
         map_with_discovery_dirs = expand(output_folder+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=samples),
-        prgs = aggregate_prgs_with_denovo_path_input,
+        light_prgs = get_light_PRGs(rules.update_msas.output.updated_msas),
+        heavy_prgs = get_heavy_PRGs(rules.update_msas.output.updated_msas),
     output:
         prgs_with_denovo_paths = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/denovo_updated.prgs_with_denovo_paths.fa",
     threads: 1
@@ -160,7 +198,7 @@ rule aggregate_prgs_with_denovo_path:
     log:
         "logs/aggregate_prgs_with_denovo_path/{technology}/{coverage}x/{sub_strategy}/.log"
     run:
-        concatenate_several_prgs_into_one(input.prgs, output.prgs_with_denovo_paths)
+        concatenate_several_prgs_into_one(input.light_prgs + input.heavy_prgs, output.prgs_with_denovo_paths)
 
 
 def cat_first_line(list_of_input_files, output_file):
