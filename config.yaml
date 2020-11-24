@@ -17,10 +17,7 @@ subsampled_reads_dir: metadata/subsampled_reads_small.csv
 msas_dir: sample_data/msas
 msas_csv: metadata/msas_small.csv
 
-# time and memory limits
-make_prg_timeout_in_second: 86400 # 1 days
-make_prg_memory_limit: 32000 # memory limit
-clustalo_timeout_in_second: 86400 # 1 days
+complex_MSA_sequence_threshold: 10
 
 containers:
   conda: "docker://continuumio/miniconda3:4.7.12"
