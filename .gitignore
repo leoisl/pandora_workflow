@@ -233,3 +233,5 @@ external_script/fix_genome_headers/output_genomes/
 /.snakemake/
 /pandora_output_small/
 /sample_data.zip
+
+.conda/

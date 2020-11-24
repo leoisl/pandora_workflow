@@ -55,9 +55,9 @@ def get_config_vars(config):
     make_prg_memory_limit = int(config["make_prg_memory_limit"])
     clustalo_timeout_in_second = int(config["clustalo_timeout_in_second"])
 
-    pandora_container = config["pandora_container"]
+    pandora_container = config["containers"]["pandora"]
 
     ignore_adding_denovo_paths_for_these_genes = config["ignore_adding_denovo_paths_for_these_genes"]
-
     return output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
-            make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas_dir, msas, subsampled_reads, ignore_adding_denovo_paths_for_these_genes
+            make_prg_timeout_in_second, make_prg_memory_limit, clustalo_timeout_in_second, msas_dir, msas, subsampled_reads, \
+            ignore_adding_denovo_paths_for_these_genes

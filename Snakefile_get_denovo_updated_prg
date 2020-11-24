@@ -16,8 +16,8 @@ for technology, sample, coverage, subsampling in itertools.product(
                                                     subsamplings):
     output_files.extend([
         f"{output_folder}/{technology}/{coverage}x/{subsampling}/prgs/denovo_updated.prg.fa",
-        f"{output_folder}/{technology}/{coverage}x/{subsampling}/all_msas_run_status.txt",
-        f"{output_folder}/{technology}/{coverage}x/{subsampling}/all_prgs_run_status.txt",
+        # f"{output_folder}/{technology}/{coverage}x/{subsampling}/all_msas_run_status.txt",
+        # f"{output_folder}/{technology}/{coverage}x/{subsampling}/all_prgs_run_status.txt",
     ])
 
 # deduplicate

@@ -22,7 +22,9 @@ make_prg_timeout_in_second: 86400 # 1 days
 make_prg_memory_limit: 32000 # memory limit
 clustalo_timeout_in_second: 86400 # 1 days
 
-pandora_container: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
+containers:
+  conda: "docker://continuumio/miniconda3:4.7.12"
+  pandora: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
 
 ignore_adding_denovo_paths_for_these_genes:
   - GC00000085_1

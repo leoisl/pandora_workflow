@@ -76,68 +76,62 @@ rule aggregate_prgs_without_denovo_path:
             get_PRGs_from_original_PRG_restricted_to_list_of_genes(original_prg_fh, prgs_without_denovo_paths_fh, genes_without_denovo_paths)
 
 
-rule get_appended_msa_to_run_clustalo:
+rule output_get_genes_with_denovo_paths:
+    output:
+        genes_with_denovo_paths_file = output_folder + "/{technology}/{coverage}x/{sub_strategy}/genes_with_denovo_paths.txt"
+    threads: 1
+    resources:
+        mem_mb=1024
+    log:
+        "logs/output_get_genes_with_denovo_paths/{technology}/{coverage}/{sub_strategy}/output_get_genes_with_denovo_paths.log"
+    run:
+        genes_with_denovo_paths = get_genes_with_denovo_paths(output_folder, wildcards.technology, wildcards.coverage,
+                                                              wildcards.sub_strategy, samples)
+        with open(output.genes_with_denovo_paths_file, "w") as fout:
+            print("\n".join(genes_with_denovo_paths), file=fout)
+localrules: output_get_genes_with_denovo_paths
+
+
+rule update_msas:
     input:
         map_with_discovery_dirs = expand(output_folder+"/{{technology}}/{{coverage}}x/{{sub_strategy}}/{sample}/map_with_discovery", sample=samples),
-        msa = msas_dir + "/{clustering_tool}/{gene}.fa"
+        msa_dir = msas_dir + "/{clustering_tool}",
+        gene_list = rules.output_get_genes_with_denovo_paths.output.genes_with_denovo_paths_file,
     output:
-        appended_msa = output_folder+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.fa",
-    threads: 1
+        updated_msas=directory(
+            output_folder+"/{technology}/{coverage}x/{sub_strategy}/updated_msas/{clustering_tool}",
+        ),
+    threads: 16
     resources:
-        mem_mb = 100
-    params:
-        log_level = "DEBUG",
-        denovo_dirs = lambda wildcards, input: [map_with_discovery_dir+"/denovo_paths"
-                                                for map_with_discovery_dir in input.map_with_discovery_dirs],
+        mem_mb=lambda wildcards, attempt: int(16000) * attempt,
+    container:
+        config["containers"]["conda"]
+    conda:
+        "../envs/update_msas.yaml"
     log:
-        "logs/get_appended_msa_to_run_clustalo/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
-    script:
-        "../scripts/get_appended_msa_to_run_clustalo.py"
-localrules: get_appended_msa_to_run_clustalo
-
-
-rule run_clustalo_after_adding_MSA_path:
-    input:
-        appended_msa = rules.get_appended_msa_to_run_clustalo.output.appended_msa
-    output:
-        updated_msa = output_folder+"/{technology}/{coverage}x/{sub_strategy}/msas/{clustering_tool}/{gene}.clustalo.fa",
-        run_status =  output_folder+"/{technology}/{coverage}x/{sub_strategy}/msas_run_status/{clustering_tool}/{gene}.status",
-    threads: 1
-    shadow: "shallow"
-    resources:
-        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 8000, 3: 16000}.get(attempt, 32000)
-    params:
-        log_level = "DEBUG",
-        clustalo_timeout_in_second = clustalo_timeout_in_second,
-        ignore_adding_denovo_paths_for_these_genes = ignore_adding_denovo_paths_for_these_genes
-    singularity: pandora_container
-    log:
-        "logs/run_clustalo_after_adding_MSA_path/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
-    script:
-        "../scripts/run_clustalo_after_adding_MSA_path.py"
+        "logs/update_msas/{technology}/{coverage}/{sub_strategy}/{clustering_tool}/update_msas.log",
+    shell:
+        """
+        python scripts/update_msas.py -o {output.updated_msas} \
+            -j {threads} -M {input.msa_dir} --gene-list {input.gene_list} {input.map_with_discovery_dirs} 2> {log}
+        """
 
 
 rule run_make_prg:
     input:
-        updated_msa = rules.run_clustalo_after_adding_MSA_path.output.updated_msa,
-        clustalo_run_status = rules.run_clustalo_after_adding_MSA_path.output.run_status,
+        updated_msas = rules.update_msas.output.updated_msas,
     output:
         prg = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs/{clustering_tool}/{gene}.prg.fa",
-        run_status =  output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs_run_status/{clustering_tool}/{gene}.status",
     threads: 1
     shadow: "shallow"
     resources:
         mem_mb = lambda wildcards, attempt: {1: 4000, 2: 12000, 3: 32000}.get(attempt, 64000)
     params:
         log_level = "DEBUG",
-        make_prg_script = "scripts/make_prg_from_msa.py",
         max_nesting_lvl = config.get("max_nesting_lvl", 5),
         prefix = lambda wildcards, output: output.prg.replace("".join(Path(output.prg).suffixes), ""),
         original_prg = original_prg,
-        make_prg_timeout_in_second = make_prg_timeout_in_second,
-        make_prg_memory_limit = make_prg_memory_limit,
-        mem_mb = lambda wildcards, resources: resources.mem_mb
-    singularity: pandora_container
+    singularity: make_prg_container
     log:
         "logs/run_make_prg/{technology}/{coverage}x/{sub_strategy}/{clustering_tool}/{gene}.log"
     script:
@@ -176,34 +170,6 @@ def cat_first_line(list_of_input_files, output_file):
                 first_line = input_file_fh.readline()
             output_fh.write(first_line)
 
-
-
-rule aggregate_msas_run_status:
-    input:
-        all_msas_status = aggregate_msas_status_input_files
-    output:
-        aggregated_msas_status = output_folder+"/{technology}/{coverage}x/{sub_strategy}/all_msas_run_status.txt",
-    threads: 1
-    resources:
-        mem_mb = lambda wildcards, attempt: 2000 * attempt
-    log:
-        "logs/aggregate_msas_run_status/{technology}/{coverage}x/{sub_strategy}/aggregate_msas_run_status.log"
-    run:
-        cat_first_line(list(input.all_msas_status), output.aggregated_msas_status)
-
-
-rule aggregate_prgs_run_status:
-    input:
-        all_prgs_status = aggregate_prgs_status_input_files
-    output:
-        aggregated_prgs_status = output_folder+"/{technology}/{coverage}x/{sub_strategy}/all_prgs_run_status.txt",
-    threads: 1
-    resources:
-        mem_mb = lambda wildcards, attempt: 2000 * attempt
-    log:
-        "logs/aggregate_prgs_run_status/{technology}/{coverage}x/{sub_strategy}/aggregate_prgs_run_status.log"
-    run:
-        cat_first_line(list(input.all_prgs_status), output.aggregated_prgs_status)
 
 
 rule aggregate_prgs:

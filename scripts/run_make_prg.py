@@ -43,7 +43,7 @@ def build_prg_after_adding_denovo_paths(
         logging.info("Building PRG for MSA.")
 
         time_spent = run_command_and_time_it(
-            ["python3", make_prg_script, "-v", "--max_nesting", str(max_nesting_lvl), "--prefix", prefix, msa],
+            ["make_prg", "prg_from_msa", "-v", "--max_nesting", str(max_nesting_lvl), "--prefix", prefix, msa],
             timeout_in_seconds)
         logging.info(f"Time in seconds: {time_spent}")
         logging.info("Finished building PRG.")

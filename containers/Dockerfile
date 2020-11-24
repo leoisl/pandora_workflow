@@ -1,7 +1,7 @@
 # If you want to use this container, it is simpler to just pull it:
 #   docker pull leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
 
-# This container has pandora and make_prg_dependencies to be used by the pandora_analysis_pipeline
+# This container has pandora to be used by the pandora_analysis_pipeline
 # to build: sudo docker build . -t leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
 FROM ubuntu:bionic
 
@@ -27,13 +27,6 @@ RUN apt update && \
 # INSTALL clustal omega
 # ========================
 RUN apt install -y clustalo=1.2.4-1
-
-
-# ========================
-# INSTALL make_prg dependencies
-# ========================
-RUN pip3 install biopython==1.72 numpy==1.14.5 scikit-learn==0.20.3 snakemake==5.23.0 && \
-    cp /usr/bin/python3 /usr/bin/python
 
 
 # ========================
