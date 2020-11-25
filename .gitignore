@@ -235,3 +235,9 @@ external_script/fix_genome_headers/output_genomes/
 /sample_data.zip
 
 .conda/
+
+.vagrant/
+
+vagrant-ssh
+
+vagrant_venv/

@@ -120,7 +120,7 @@ checkpoint update_msas:
 rule run_light_make_prg:
     input:
         MSAs = lambda wildcards: get_light_MSAs(
-            updated_msas_dir = Path(checkpoints.update_msas.get(**wildcards).output),
+            updated_msas_dir = Path(checkpoints.update_msas.get(**wildcards).output[0]),
             complex_MSA_sequence_threshold = int(config["complex_MSA_sequence_threshold"]))
     output:
         prgs = directory(
@@ -137,7 +137,7 @@ rule run_light_make_prg:
     log:
         "logs/run_light_make_prg/{technology}/{coverage}x/{sub_strategy}/custom/run_light_make_prg.log"
     script:
-        "scripts/run_light_make_prg.py"
+        "../scripts/run_light_make_prg.py"
 
 
 
@@ -152,15 +152,14 @@ rule run_heavy_make_prg:
     params:
         max_nesting_lvl = config.get("max_nesting_lvl", 5),
         min_match_length = config.get("min_match_length", 7),
-        prefix = lambda wildcards, output: output.prg.replace("".join(Path(output.prg).suffixes), ""),
     # singularity: config["containers"]["conda"]  # TODO
     shadow: "shallow"
     log:
         "logs/run_heavy_make_prg/{technology}/{coverage}x/{sub_strategy}/custom/{gene}.log"
     shell:
          """
-         make_prg from_msa --max_nesting {params.max_nesting_lvl} --prefix {params.prefix} {input.updated_msa}
-         cp {params.prefix}.max_nest{params.max_nesting_lvl}.min_match{params.min_match_length}.prg {output.prg}
+         make_prg from_msa --max_nesting {params.max_nesting_lvl} --prefix {wildcards.gene} {input.updated_msa}
+         cp {wildcards.gene}.max_nest{params.max_nesting_lvl}.min_match{params.min_match_length}.prg {output.prg}
          """
 
 
@@ -177,12 +176,9 @@ def concatenate_several_prgs_into_one(input_prgs, output_prg):
 
 rule aggregate_prgs_with_denovo_path:
     input:
-        light_prgs = lambda wildcards: get_light_PRGs(
-            updated_msas_dir = Path(checkpoints.update_msas.get(**wildcards).output),
-            light_prgs_dir   = Path(output_folder+"/{technology}/{coverage}x/{sub_strategy}/light_prgs/custom"),
-            complex_MSA_sequence_threshold = int(config["complex_MSA_sequence_threshold"])),
+        light_prgs_dir = rules.run_light_make_prg.output.prgs,
         heavy_prgs = lambda wildcards: get_heavy_PRGs(
-            updated_msas_dir = Path(checkpoints.update_msas.get(**wildcards).output),
+            updated_msas_dir = checkpoints.update_msas.get(**wildcards).output[0],
             heavy_prgs_dir   = Path(output_folder+f"/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/heavy_prgs/custom"),
             complex_MSA_sequence_threshold = int(config["complex_MSA_sequence_threshold"])),
     output:
@@ -193,7 +189,11 @@ rule aggregate_prgs_with_denovo_path:
     log:
         "logs/aggregate_prgs_with_denovo_path/{technology}/{coverage}x/{sub_strategy}/.log"
     run:
-        concatenate_several_prgs_into_one(input.light_prgs + input.heavy_prgs, output.prgs_with_denovo_paths)
+        light_prgs = get_light_PRGs(
+            updated_msas_dir = Path(output_folder+f"/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/updated_msas/custom/"),
+            light_prgs_dir   = Path(output_folder+f"/{wildcards.technology}/{wildcards.coverage}x/{wildcards.sub_strategy}/light_prgs/custom"),
+            complex_MSA_sequence_threshold = int(config["complex_MSA_sequence_threshold"])),
+        concatenate_several_prgs_into_one(light_prgs[0] + list(input.heavy_prgs), output.prgs_with_denovo_paths)
 
 
 def cat_first_line(list_of_input_files, output_file):

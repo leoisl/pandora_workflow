@@ -30,7 +30,7 @@ rule map_with_discovery:
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 30000,
     params:
-        log_level="info",
+        log_level="debug",
         use_discover=True,
     log:
         "logs/map_with_discovery/{technology}/{coverage}x/{sub_strategy}/{sample}.log"

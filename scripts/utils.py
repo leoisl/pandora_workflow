@@ -66,7 +66,7 @@ class LocusComplexity:
         # implements locus_complexity_records caching/memoization
         if LocusComplexity.__locus_complexity_records is None:
             LocusComplexity.__locus_complexity_records = []
-            file_list = [file for file in Path(updated_msas_dir).iterdir() if file.is_file()]
+            file_list = [file for file in Path(updated_msas_dir).iterdir() if file.is_file() and file.suffix==".fa"]
             for file in file_list:
                 gene = file.with_suffix("").name
                 nb_of_seqs = get_number_of_sequences_in_fasta(str(file))
@@ -103,7 +103,7 @@ def get_light_PRGs(updated_msas_dir: Path,
                    complex_MSA_sequence_threshold: int) -> List[str]:
     locus_complexity_records = LocusComplexity.get_locus_complexity_records(updated_msas_dir)
     light_records = filter(
-        lambda locus_complexity_record: locus_complexity_record.nb_of_seqs > complex_MSA_sequence_threshold,
+        lambda locus_complexity_record: locus_complexity_record.nb_of_seqs <= complex_MSA_sequence_threshold,
         locus_complexity_records)
     light_PRGs = [light_prgs_dir / f"{light_record.gene}.prg.fa" for light_record in light_records]
     return [str(light_PRG) for light_PRG in light_PRGs]
@@ -116,6 +116,7 @@ def get_heavy_PRGs(updated_msas_dir: Path,
         lambda locus_complexity_record: locus_complexity_record.nb_of_seqs > complex_MSA_sequence_threshold,
         locus_complexity_records)
     heavy_PRGs = [heavy_prgs_dir / f"{heavy_record.gene}.prg.fa" for heavy_record in heavy_records]
+    print(f"get_heavy_PRGs = {[str(heavy_PRG) for heavy_PRG in heavy_PRGs]}")
     return [str(heavy_PRG) for heavy_PRG in heavy_PRGs]
 
 
@@ -158,6 +159,6 @@ def test_get_heavy_MSAs():
     ])
 
 
-test_get_locus_complexity_records()
-test_get_light_MSAs()
-test_get_heavy_MSAs()
+# test_get_locus_complexity_records()
+# test_get_light_MSAs()
+# test_get_heavy_MSAs()
