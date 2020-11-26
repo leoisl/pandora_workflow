@@ -10,13 +10,16 @@ subsamplings:
 technologies:
   - nanopore
 
+
 samples: metadata/samples_pandora_paper_tag1.4way_new_basecall.csv
 subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.4way_new_basecall.csv
 
 msas_dir: ../data/msas
 msas_csv: metadata/msas_pandora_paper_tag1.csv
 
-complex_MSA_sequence_threshold: 50
+complex_MSA_sequence_threshold: 400
 
-pandora_container: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
-
+containers:
+  conda: "docker://continuumio/miniconda3:4.7.12"
+  pandora: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
+  make_prg: docker://leandroishilima/make_prg:c61d9b
