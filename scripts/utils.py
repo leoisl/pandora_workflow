@@ -116,7 +116,6 @@ def get_heavy_PRGs(updated_msas_dir: Path,
         lambda locus_complexity_record: locus_complexity_record.nb_of_seqs > complex_MSA_sequence_threshold,
         locus_complexity_records)
     heavy_PRGs = [heavy_prgs_dir / f"{heavy_record.gene}.prg.fa" for heavy_record in heavy_records]
-    print(f"get_heavy_PRGs = {[str(heavy_PRG) for heavy_PRG in heavy_PRGs]}")
     return [str(heavy_PRG) for heavy_PRG in heavy_PRGs]
 
 

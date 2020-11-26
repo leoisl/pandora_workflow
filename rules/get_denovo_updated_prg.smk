@@ -128,11 +128,11 @@ rule run_light_make_prg:
         )
     threads: 16
     resources:
-        mem_mb = lambda wildcards, attempt: {1: 16000, 2: 32000, 3: 64000}.get(attempt, 128000)
+        mem_mb = lambda wildcards, attempt: {1: 8000, 2: 16000, 3: 32000}.get(attempt, 64000)
     params:
         max_nesting_lvl = config.get("max_nesting_lvl", 5),
         min_match_length = config.get("min_match_length", 7),
-    # singularity: config["containers"]["conda"]  # TODO
+    singularity: config["containers"]["make_prg"]
     shadow: "shallow"
     log:
         "logs/run_light_make_prg/{technology}/{coverage}x/{sub_strategy}/custom/run_light_make_prg.log"
@@ -148,19 +148,16 @@ rule run_heavy_make_prg:
         prg = output_folder+"/{technology}/{coverage}x/{sub_strategy}/heavy_prgs/custom/{gene}.prg.fa",
     threads: 1
     resources:
-        mem_mb = lambda wildcards, attempt: {1: 16000, 2: 32000, 3: 64000}.get(attempt, 128000)
+        mem_mb = lambda wildcards, attempt: {1: 8000, 2: 16000, 3: 32000}.get(attempt, 64000)
     params:
         max_nesting_lvl = config.get("max_nesting_lvl", 5),
         min_match_length = config.get("min_match_length", 7),
-    # singularity: config["containers"]["conda"]  # TODO
+    singularity: config["containers"]["make_prg"]
     shadow: "shallow"
     log:
         "logs/run_heavy_make_prg/{technology}/{coverage}x/{sub_strategy}/custom/{gene}.log"
-    shell:
-         """
-         make_prg from_msa --max_nesting {params.max_nesting_lvl} --prefix {wildcards.gene} {input.updated_msa}
-         cp {wildcards.gene}.max_nest{params.max_nesting_lvl}.min_match{params.min_match_length}.prg {output.prg}
-         """
+    script:
+        "../scripts/run_heavy_make_prg.py"
 
 
 

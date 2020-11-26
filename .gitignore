@@ -241,3 +241,7 @@ external_script/fix_genome_headers/output_genomes/
 vagrant-ssh
 
 vagrant_venv/
+
+pandora_output_small_heavy_only/
+
+pandora_output_small_light_only/

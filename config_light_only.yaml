@@ -1,4 +1,4 @@
-output_folder: "pandora_output_small"
+output_folder: "pandora_output_small_light_only"
 original_prg: "sample_data/prgs/prg.fa"
 
 coverages:
@@ -17,7 +17,7 @@ subsampled_reads_dir: metadata/subsampled_reads_small.csv
 msas_dir: sample_data/msas
 msas_csv: metadata/msas_small.csv
 
-complex_MSA_sequence_threshold: 50
+complex_MSA_sequence_threshold: 10000
 
 containers:
   conda: "docker://continuumio/miniconda3:4.7.12"

@@ -53,6 +53,6 @@ def get_config_vars(config):
 
     pandora_container = config["containers"]["pandora"]
 
-    ignore_adding_denovo_paths_for_these_genes = config["ignore_adding_denovo_paths_for_these_genes"]
+    ignore_adding_denovo_paths_for_these_genes = config.get("ignore_adding_denovo_paths_for_these_genes", [])
     return output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
             msas_dir, msas, subsampled_reads, ignore_adding_denovo_paths_for_these_genes

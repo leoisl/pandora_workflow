@@ -5,6 +5,7 @@ import shlex
 import shutil
 import subprocess
 import uuid
+import time
 from collections import defaultdict
 from multiprocessing import Pool
 from pathlib import Path
@@ -43,7 +44,7 @@ def concatenate(infiles: List[Path], outfile: Path):
 
 def update_with_new_sequences(msa: Path, new_sequences: List[Path], outdir: Path):
     name = extract_name_from_path(msa)
-    logging.debug(f"Updating MSA for {name}...")
+    logging.info(f"Updating MSA for {name}...")
 
     new_sequence_file = outdir / f"tmp.new_sequences.{name}.fa"
     concatenate(new_sequences, new_sequence_file)
@@ -74,6 +75,8 @@ def update_with_new_sequences(msa: Path, new_sequences: List[Path], outdir: Path
             new_msa,
         ]
     )
+
+    start = time.time()
     process = subprocess.Popen(
         args, stderr=subprocess.PIPE, encoding="utf-8", shell=True, env=env,
     )
@@ -84,7 +87,10 @@ def update_with_new_sequences(msa: Path, new_sequences: List[Path], outdir: Path
             f"Failed to execute mafft for {name} due to the following error:\n"
             f"{process.stderr.read()}"
         )
-    logging.debug(f"Finished updating MSA for {name}")
+    stop = time.time()
+    runtime = stop-start
+    logging.info(f"Finished updating MSA for {name}")
+    logging.info(f"MAFFT update runtime for {name} in seconds: {runtime:.3f}")
     new_sequence_file.unlink(missing_ok=True)
 
 
