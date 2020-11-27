@@ -20,6 +20,6 @@ msas_csv: metadata/msas_pandora_paper_tag1.csv
 complex_MSA_sequence_threshold: 400
 
 containers:
-  conda: "docker://continuumio/miniconda3:4.7.12"
+  mafft: docker://leandroishilima/pandora_workflow_mafft:latest
   pandora: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
   make_prg: docker://leandroishilima/make_prg:c61d9b

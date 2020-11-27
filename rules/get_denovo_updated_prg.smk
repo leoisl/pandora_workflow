@@ -105,9 +105,7 @@ checkpoint update_msas:
     resources:
         mem_mb=lambda wildcards, attempt: int(16000) * attempt,
     container:
-        config["containers"]["conda"]
-    conda:
-        "../envs/update_msas.yaml"
+        config["containers"]["mafft"]
     log:
         "logs/update_msas/{technology}/{coverage}/{sub_strategy}/custom/update_msas.log",
     shell:

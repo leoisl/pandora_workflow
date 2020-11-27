@@ -91,7 +91,9 @@ def update_with_new_sequences(msa: Path, new_sequences: List[Path], outdir: Path
     runtime = stop-start
     logging.info(f"Finished updating MSA for {name}")
     logging.info(f"MAFFT update runtime for {name} in seconds: {runtime:.3f}")
-    new_sequence_file.unlink(missing_ok=True)
+
+    if new_sequence_file.exists():
+        new_sequence_file.unlink()
 
 
 @click.command()
