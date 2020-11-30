@@ -67,7 +67,7 @@ def update_with_new_sequences(msa: Path, new_sequences: List[Path], outdir: Path
             "mafft",
             "--auto",
             "--thread",
-            "-1",
+            "1",
             "--add",
             new_sequence_shstr,
             existing_msa,
@@ -226,7 +226,7 @@ def main(
     if processes == 0:
         logging.info(f"{processes} processed requested. Using all available...")
         processes = None
-    with Pool(processes=processes) as pool:
+    with Pool(processes=processes, maxtasksperchild=20) as pool:
         logging.info(f"Updating {len(jobs)} MSAs...")
         pool.starmap(update_with_new_sequences, jobs)
 
