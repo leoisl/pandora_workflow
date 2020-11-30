@@ -66,6 +66,7 @@ def update_with_new_sequences(msa: Path, new_sequences: List[Path], outdir: Path
         [
             "mafft",
             "--auto",
+            "--quiet",
             "--thread",
             "1",
             "--add",
