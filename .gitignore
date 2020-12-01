@@ -245,3 +245,5 @@ vagrant_venv/
 pandora_output_small_heavy_only/
 
 pandora_output_small_light_only/
+
+external_script/plot_MSAs_sizes/msas_sizes.txt
