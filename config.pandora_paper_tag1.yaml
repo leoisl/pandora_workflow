@@ -17,12 +17,13 @@ subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.csv
 msas_dir: ../data/msas
 msas_csv: metadata/msas_pandora_paper_tag1.csv
 
-# time and memory limits
-make_prg_timeout_in_second: 86400 # 1 days
-make_prg_memory_limit: 32000 # memory limit
-clustalo_timeout_in_second: 86400 # 1 days
+complex_MSA_sequence_threshold: 1000
 
-pandora_container: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
+pandora_exec: /hps/software/users/iqbal/leandro/pandora_73dea5/pandora/build_release/pandora
+
+containers:
+  mafft: docker://leandroishilima/pandora_workflow_mafft:latest
+  make_prg: docker://leandroishilima/make_prg:c61d9b
 
 ignore_adding_denovo_paths_for_these_genes:
   - GC00000027_2

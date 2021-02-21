@@ -4,8 +4,8 @@ from Snakefile_utils import *
 configfile: "config.yaml"
 
 # setup global vars
-output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
-msas_dir, msas, subsampled_reads, ignore_adding_denovo_paths_for_these_genes = get_config_vars(config)
+output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_exec, \
+msas_dir, msas, subsampled_reads, ignore_adding_denovo_paths_for_these_genes =  get_config_vars(config)
 
 output_files = []
 for technology, sample, coverage, subsampling in itertools.product(
@@ -14,10 +14,8 @@ for technology, sample, coverage, subsampling in itertools.product(
                                                     coverages,
                                                     subsamplings):
     output_files.extend([
-        f"{output_folder}/{technology}/{coverage}x/{subsampling}/compare_nodenovo_local_genotyping/pandora_multisample_genotyped_local.vcf",
-        f"{output_folder}/{technology}/{coverage}x/{subsampling}/compare_nodenovo_global_genotyping/pandora_multisample_genotyped_global.vcf",
-        f"{output_folder}/{technology}/{coverage}x/{subsampling}/compare_withdenovo_local_genotyping/pandora_multisample_genotyped_local.vcf",
-        f"{output_folder}/{technology}/{coverage}x/{subsampling}/compare_withdenovo_global_genotyping/pandora_multisample_genotyped_global.vcf",
+        f"{output_folder}/{technology}/{coverage}x/{subsampling}/compare_nodenovo/pandora_multisample_genotyped.vcf",
+        f"{output_folder}/{technology}/{coverage}x/{subsampling}/compare_withdenovo/pandora_multisample_genotyped.vcf",
     ])
 
 

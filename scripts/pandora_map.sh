@@ -34,15 +34,13 @@ genome_size=$(grep -v '>' "$input_ref" | wc | awk '{ print $3-$1 }')
 mkdir -p "$outdir"
 cd "$outdir" || exit 1
 
-"$pandora_executable" map --prg_file "$prg_file" \
-    --read_file "$input_reads" \
+"$pandora_executable" discover \
     --outdir "$outdir" \
     -t "$threads" \
-    --output_kg \
-    --genome_size "$genome_size" \
-    --output_covgs \
-    --output_vcf \
-    --log_level "$log_level" \
-    --max_covg 100000 \
+    --kg \
+    --genome-size "$genome_size" \
+    -v \
+    --max-covg 100000 \
     ${technology_param} \
-    "$discover" > "$log" 2>&1
+    "$prg_file" \
+    "$input_reads" > "$log" 2>&1

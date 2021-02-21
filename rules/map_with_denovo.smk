@@ -8,13 +8,14 @@ rule index_original_prg:
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 16000
+    params:
+        pandora_exec = pandora_exec
     log:
         "logs/index_original_prg.log"
-    singularity: pandora_container
     shell:
         """
         cp {input.prg} {output.linked_prg}
-        pandora index -t {threads} {output.linked_prg} >{log} 2>&1
+        {params.pandora_exec} index -t {threads} {output.linked_prg} >{log} 2>&1
         """
 
 
@@ -32,12 +33,12 @@ rule map_with_discovery:
     params:
         log_level="debug",
         use_discover=True,
+        pandora_exec = pandora_exec,
     log:
         "logs/map_with_discovery/{technology}/{coverage}x/{sub_strategy}/{sample}.log"
-    singularity: pandora_container
     shell:
         """
-        bash scripts/pandora_map.sh pandora {input.prg} \
+        bash scripts/pandora_map.sh {params.pandora_exec} {input.prg} \
             {input.reads} \
             {output.outdir} \
             {threads} \

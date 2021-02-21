@@ -4,8 +4,8 @@ from Snakefile_utils import *
 configfile: "config.yaml"
 
 # setup global vars
-output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
-msas_dir, msas, subsampled_reads, ignore_adding_denovo_paths_for_these_genes = get_config_vars(config)
+output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_exec, \
+msas_dir, msas, subsampled_reads, ignore_adding_denovo_paths_for_these_genes =  get_config_vars(config)
 
 output_files = []
 for technology, sample, coverage, subsampling in itertools.product(

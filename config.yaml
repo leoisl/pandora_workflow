@@ -19,7 +19,8 @@ msas_csv: metadata/msas_small.csv
 
 complex_MSA_sequence_threshold: 50
 
+pandora_exec: /home/leandro/git/pandora/cmake-build-debug-coverage/pandora
+
 containers:
   mafft: docker://leandroishilima/pandora_workflow_mafft:latest
-  pandora: docker://leandroishilima/pandora_analysis_pipeline:pandora_paper_tag1
   make_prg: docker://leandroishilima/make_prg:c61d9b

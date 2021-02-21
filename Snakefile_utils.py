@@ -51,8 +51,8 @@ def get_config_vars(config):
     msas = pd.read_csv(msas_csv)
     msas = update_to_absolute_path(msas, ["msa"])
 
-    pandora_container = config["containers"]["pandora"]
+    pandora_exec = config["pandora_exec"]
 
     ignore_adding_denovo_paths_for_these_genes = config.get("ignore_adding_denovo_paths_for_these_genes", [])
-    return output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_container, \
+    return output_folder, original_prg, coverages, subsamplings, technologies, samples_df, samples, pandora_exec, \
             msas_dir, msas, subsampled_reads, ignore_adding_denovo_paths_for_these_genes
