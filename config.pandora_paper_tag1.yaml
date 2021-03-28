@@ -1,5 +1,4 @@
 output_folder: pandora_output_pandora_paper_tag1
-original_prg: ../data/prgs/ecoli_pangenome_PRG_210619.fa
 
 coverages:
   - 100
@@ -13,18 +12,9 @@ technologies:
 
 samples: metadata/samples_pandora_paper_tag1.csv
 subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.csv
-
 msas_dir: ../data/msas
-msas_csv: metadata/msas_pandora_paper_tag1.csv
 
-complex_MSA_sequence_threshold: 1000
-
-pandora_exec: /hps/software/users/iqbal/leandro/pandora_73dea5/pandora/build_release/pandora
-
+pandora_URL: "https://github.com/rmcolq/pandora/releases/download/pandora_paper_tag1/pandora-linux-precompiled-pandora_paper_tag1.gz"
+make_prg_URL: "https://github.com/leoisl/make_prg/releases/download/v0.2.0_prototype/make_prg_0.2.0_prototype"
 containers:
   mafft: docker://leandroishilima/pandora_workflow_mafft:latest
-  make_prg: docker://leandroishilima/make_prg:c61d9b
-
-ignore_adding_denovo_paths_for_these_genes:
-  - GC00000027_2
-  - GC00004221
