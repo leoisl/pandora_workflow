@@ -95,7 +95,6 @@ rule download_pandora:
         """
         (cd {params.outdir} && \
         wget {pandora_URL} && \
-        gunzip pandora* && \
         mv pandora* pandora && \
         chmod +x ./pandora) >{log} 2>&1
         """
