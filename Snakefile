@@ -150,7 +150,7 @@ rule make_prg_from_msa:
         update_DS = output_folder+"/prgs/ecoli_pangenome_PRG.update_DS",
     threads: 16
     resources:
-        mem_mb = lambda wildcards, attempt: attempt * 4000
+        mem_mb = lambda wildcards, attempt: attempt * 20000
     params:
         output_prefix = output_folder+"/prgs/ecoli_pangenome_PRG"
     log:
