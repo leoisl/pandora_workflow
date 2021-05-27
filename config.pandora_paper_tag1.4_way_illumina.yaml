@@ -13,7 +13,7 @@ samples: metadata/samples_pandora_paper_tag1.4way_illumina.csv
 subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.4way_illumina.csv
 msas_dir: ../data/msas
 
-pandora_URL: "https://github.com/rmcolq/pandora/releases/download/0.9.0-rc2/pandora-linux-precompiled-v0.9.0-rc2"
-make_prg_URL: "https://github.com/leoisl/make_prg/releases/download/v0.2.0_prototype/make_prg_0.2.0_prototype"
+pandora_URL: "https://github.com/rmcolq/pandora/releases/download/0.9.1/pandora-linux-precompiled-v0.9.1"
+make_prg_URL: "https://github.com/leoisl/make_prg/releases/download/v0.2.0/make_prg_0.2.0"
 containers:
   mafft: docker://leandroishilima/pandora_workflow_mafft:latest
