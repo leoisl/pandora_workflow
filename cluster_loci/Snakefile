@@ -40,6 +40,7 @@ rule run_clustalo_on_genes:
     shadow: "shallow"
     resources:
         mem_mb = lambda wildcards, attempt: {1: 4000, 2: 8000, 3: 16000}.get(attempt, 32000)
+    singularity: "docker://quay.io/biocontainers/clustalo:1.2.4--h1b792b2_4"
     log:
         "logs/run_clustalo_on_genes/{gene}.log"
     shell:
