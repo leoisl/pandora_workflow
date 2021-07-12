@@ -1,0 +1,27 @@
+import os
+
+configfile: "config.yaml"
+
+def get_all_genes():
+    all_genes = [file for file in os.listdir(config["input_dir"]) if file.endswith(".fa") and file.startswith("GC")]
+    all_genes = list(set([gene.split("_")[0] for gene in all_genes]))
+    all_genes = list(map(lambda gene: gene[:-3] if gene.endswith(".fa") else gene,all_genes))
+    return all_genes
+
+rule concat_MSAs_from_same_loci:
+    input:
+        input_dir = config["input_dir"]
+    output:
+        output_dir = directory(config["output_dir"]+"/msas_from_same_loci")
+    threads: 1
+    resources:
+        mem_mb=200
+    log:
+        "logs/concat_MSAs_from_same_loci.log"
+    run:
+        import os
+        import subprocess
+        os.makedirs(output.output_dir, exist_ok=True)
+        all_genes = get_all_genes()
+        for gene in all_genes:
+            subprocess.check_call(f"cat {input.input_dir}/{gene}*.fa > {output.output_dir}/{gene}.fa", shell=True)

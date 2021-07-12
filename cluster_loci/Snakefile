@@ -1,0 +1,46 @@
+import os
+configfile: "config.yaml"
+def get_all_genes():
+    all_genes = [file for file in os.listdir(config["input_dir"]) if file.endswith(".fa") and file.startswith("GC")]
+    all_genes = list(set([gene.split("_")[0] for gene in all_genes]))
+    all_genes = list(map(lambda gene: gene[:-3] if gene.endswith(".fa") else gene,all_genes))
+    print(all_genes)
+    return all_genes
+
+rule all:
+    input:
+        config['output_dir']+"/intergenic_regions_done_flag",
+        [f"{config['output_dir']}/output/{gene}.fa" for gene in get_all_genes()]
+
+
+rule copy_intergenic_regions_to_output_folder:
+    input:
+        input_dir = config["input_dir"]
+    output:
+        config['output_dir']+"/intergenic_regions_done_flag"
+    threads: 1
+    resources:
+        mem_mb=200
+    params:
+        output_dir = config['output_dir']
+    shell:
+        """
+        mkdir -p {params.output_dir}
+        cp {input}/Cluster_*.fa {params.output_dir}
+        touch {output}
+        """
+
+
+rule run_clustalo_on_genes:
+    input:
+        MSA_to_be_realigned = config["output_dir"]+"/msas_from_same_loci/{gene}.fa"
+    output:
+        MSA = f"{config['output_dir']}/output/{{gene}}.fa"
+    threads: 1
+    shadow: "shallow"
+    resources:
+        mem_mb = lambda wildcards, attempt: {1: 4000, 2: 8000, 3: 16000}.get(attempt, 32000)
+    log:
+        "logs/run_clustalo_on_genes/{gene}.log"
+    shell:
+        "clustalo --dealign --threads {threads} --in {input} --out {output}"
