@@ -10,7 +10,7 @@ def get_all_genes():
 rule all:
     input:
         config['output_dir']+"/intergenic_regions_done_flag",
-        [f"{config['output_dir']}/output/{gene}.fa" for gene in get_all_genes()]
+        [f"{config['output_dir']}/final_msas/{gene}.fa" for gene in get_all_genes()]
 
 
 rule copy_intergenic_regions_to_output_folder:
@@ -25,17 +25,18 @@ rule copy_intergenic_regions_to_output_folder:
         output_dir = config['output_dir']
     shell:
         """
-        mkdir -p {params.output_dir}
-        cp {input}/Cluster_*.fa {params.output_dir}
+        mkdir -p {params.output_dir}/final_msas
+        cp {input}/Cluster_*.fa {params.output_dir}/final_msas
         touch {output}
         """
 
 
 rule run_clustalo_on_genes:
     input:
-        MSA_to_be_realigned = config["output_dir"]+"/msas_from_same_loci/{gene}.fa"
+        MSA_to_be_realigned = config["output_dir"]+"/msas_from_same_loci/{gene}.fa",
+        flag = config['output_dir'] + "/intergenic_regions_done_flag"
     output:
-        MSA = f"{config['output_dir']}/output/{{gene}}.fa"
+        MSA = f"{config['output_dir']}/final_msas/{{gene}}.fa"
     threads: 1
     shadow: "shallow"
     resources:
@@ -44,4 +45,12 @@ rule run_clustalo_on_genes:
     log:
         "logs/run_clustalo_on_genes/{gene}.log"
     shell:
-        "clustalo --dealign --threads {threads} --in {input} --out {output}"
+        """
+        nb_of_seqs=`grep "^>" input_msas/GC00010509.fa | wc -l`
+        if [ "$nb_of_seqs" -eq 1 ]
+        then
+            cp {input.MSA_to_be_realigned} {output.MSA}
+        else
+            clustalo --dealign --threads {threads} --in {input.MSA_to_be_realigned} --out {output.MSA}
+        fi
+        """
