@@ -48,8 +48,7 @@ subsampled_reads = update_to_absolute_path(subsampled_reads, ["subsampled_reads_
 
 msas_dir = config["msas_dir"]
 pandora_URL = config["pandora_URL"]
-make_prg_URL = config["make_prg_URL"]
-mafft_container = config["containers"]["mafft"]
+make_prg_container = config["containers"]["make_prg"]
 ########################################################################################################################
 ########################################################################################################################
 
@@ -100,25 +99,6 @@ rule download_pandora:
         """
 
 
-rule download_make_prg:
-    output:
-        make_prg_exec = output_folder + "/tools/make_prg"
-    params:
-        outdir = lambda wildcards, output: str(Path(output.make_prg_exec).parent),
-    threads: 1
-    resources:
-        mem_mb=200
-    log:
-        "logs/download_make_prg.log"
-    shell:
-        """
-        (cd {params.outdir} && \
-        wget {make_prg_URL} && \
-        mv make_prg* make_prg && \
-        chmod +x ./make_prg) >{log} 2>&1
-        """
-
-
 rule create_read_index:
     input:
         reads = lambda wildcards: [get_reads(subsampled_reads, wildcards.technology, sample, wildcards.coverage, wildcards.sub_strategy) for sample in samples],
@@ -143,12 +123,11 @@ rule create_read_index:
 rule make_prg_from_msa:
     input:
         msas_dir = msas_dir,
-        make_prg_exec = rules.download_make_prg.output.make_prg_exec
     output:
         prg_file = output_folder+"/prgs/ecoli_pangenome_PRG.prg.fa",
         prg_folder = directory(output_folder+"/prgs/ecoli_pangenome_PRG_prgs"),
         update_DS = output_folder+"/prgs/ecoli_pangenome_PRG.update_DS",
-    threads: 16
+    threads: 1  # TODO: 1 thread because I want to look at the log, put it back to 16
     resources:
         mem_mb = lambda wildcards, attempt: attempt * 20000
     params:
@@ -156,7 +135,8 @@ rule make_prg_from_msa:
     log:
         "logs/make_prg_from_msa.log"
     shell:
-        "{input.make_prg_exec} from_msa --input {input.msas_dir} --output_prefix {params.output_prefix} -t {threads} >{log} 2>&1"
+        "make_prg from_msa --input {input.msas_dir} --output_prefix {params.output_prefix} -t {threads} -vv "
+        "--output_graphs >{log} 2>&1"
 
 
 rule index_original_prg:
@@ -199,20 +179,19 @@ rule update_prg:
     input:
         update_DS = rules.make_prg_from_msa.output.update_DS,
         pandora_discover_out = rules.pandora_discover.output.outdir,
-        make_prg_exec = rules.download_make_prg.output.make_prg_exec
     output:
         prg_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.fa"
-    threads: 16
+    threads: 1 # TODO: 1 thread because I want to look at the log, put it back to 16
     resources:
         mem_mb = lambda wildcards, attempt: attempt * 20000
     params:
         output_prefix = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG"
-    container: mafft_container
+    container: make_prg_container
     log:
         "logs/{technology}/{coverage}x/{sub_strategy}/update_prg.log"
     shell:
-        "{input.make_prg_exec} update --update_DS {input.update_DS} --denovo_paths {input.pandora_discover_out}/denovo_paths.txt "
-        "--output_prefix {params.output_prefix} -t {threads} >{log} 2>&1"
+        "make_prg update --update_DS {input.update_DS} --denovo_paths {input.pandora_discover_out}/denovo_paths.txt "
+        "--output_prefix {params.output_prefix} -t {threads} -vv --output_graphs >{log} 2>&1"
 
 
 rule index_updated_prg:
