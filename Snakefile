@@ -132,6 +132,7 @@ rule make_prg_from_msa:
         mem_mb = lambda wildcards, attempt: attempt * 20000
     params:
         output_prefix = output_folder+"/prgs/ecoli_pangenome_PRG"
+    container: make_prg_container
     log:
         "logs/make_prg_from_msa.log"
     shell:
