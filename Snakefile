@@ -125,8 +125,9 @@ rule make_prg_from_msa:
         msas_dir = msas_dir,
     output:
         prg_file = output_folder+"/prgs/ecoli_pangenome_PRG.prg.fa",
-        prg_folder = directory(output_folder+"/prgs/ecoli_pangenome_PRG_prgs"),
-        update_DS = output_folder+"/prgs/ecoli_pangenome_PRG.update_DS",
+        prg_bin_file = output_folder+"/prgs/ecoli_pangenome_PRG.prg.bin.zip",
+        prg_gfa_file = output_folder+"/prgs/ecoli_pangenome_PRG.prg.gfa.zip",
+        prg_update_file = output_folder+"/prgs/ecoli_pangenome_PRG.update_DS.zip",
     threads: 1  # TODO: 1 thread because I want to look at the log, put it back to 16
     resources:
         mem_mb = lambda wildcards, attempt: attempt * 20000
@@ -178,7 +179,7 @@ rule pandora_discover:
 
 rule update_prg:
     input:
-        update_DS = rules.make_prg_from_msa.output.update_DS,
+        update_DS = rules.make_prg_from_msa.output.prg_update_file,
         pandora_discover_out = rules.pandora_discover.output.outdir,
     output:
         prg_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.fa"
