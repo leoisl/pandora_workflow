@@ -137,8 +137,7 @@ rule make_prg_from_msa:
     log:
         "logs/make_prg_from_msa.log"
     shell:
-        "make_prg from_msa --input {input.msas_dir} --output_prefix {params.output_prefix} -t {threads} "
-        "--output_graphs >{log} 2>&1"
+        "make_prg from_msa --input {input.msas_dir} --output_prefix {params.output_prefix} -t {threads} >{log} 2>&1"
 
 
 rule index_original_prg:
@@ -196,7 +195,7 @@ rule update_prg:
         "logs/{technology}/{coverage}x/{sub_strategy}/update_prg.log"
     shell:
         "make_prg update --update_DS {input.update_DS} --denovo_paths {input.pandora_discover_out}/denovo_paths.txt "
-        "--output_prefix {params.output_prefix} -t {threads} --output_graphs >{log} 2>&1"
+        "--output_prefix {params.output_prefix} -t {threads} >{log} 2>&1"
 
 
 rule index_updated_prg:
