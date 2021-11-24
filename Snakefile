@@ -128,7 +128,7 @@ rule make_prg_from_msa:
         prg_bin_file = output_folder+"/prgs/ecoli_pangenome_PRG.prg.bin.zip",
         prg_gfa_file = output_folder+"/prgs/ecoli_pangenome_PRG.prg.gfa.zip",
         prg_update_file = output_folder+"/prgs/ecoli_pangenome_PRG.update_DS.zip",
-    threads: 1  # TODO: 1 thread because I want to look at the log, put it back to 16
+    threads: 16
     resources:
         mem_mb = lambda wildcards, attempt: attempt * 20000
     params:
@@ -137,7 +137,7 @@ rule make_prg_from_msa:
     log:
         "logs/make_prg_from_msa.log"
     shell:
-        "make_prg from_msa --input {input.msas_dir} --output_prefix {params.output_prefix} -t {threads} -vv "
+        "make_prg from_msa --input {input.msas_dir} --output_prefix {params.output_prefix} -t {threads} "
         "--output_graphs >{log} 2>&1"
 
 
@@ -180,12 +180,15 @@ rule pandora_discover:
 rule update_prg:
     input:
         update_DS = rules.make_prg_from_msa.output.prg_update_file,
-        pandora_discover_out = rules.pandora_discover.output.outdir,
+        pandora_discover_out = rules.pandora_discover.output.outdir
     output:
-        prg_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.fa"
-    threads: 1 # TODO: 1 thread because I want to look at the log, put it back to 16
+        prg_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.fa",
+        prg_bin_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.bin.zip",
+        prg_gfa_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.gfa.zip",
+        prg_update_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.update_DS.zip",
+    threads: 16
     resources:
-        mem_mb = lambda wildcards, attempt: attempt * 20000
+        mem_mb = lambda wildcards, attempt: attempt * 40000
     params:
         output_prefix = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG"
     container: make_prg_container
@@ -193,7 +196,7 @@ rule update_prg:
         "logs/{technology}/{coverage}x/{sub_strategy}/update_prg.log"
     shell:
         "make_prg update --update_DS {input.update_DS} --denovo_paths {input.pandora_discover_out}/denovo_paths.txt "
-        "--output_prefix {params.output_prefix} -t {threads} -vv --output_graphs >{log} 2>&1"
+        "--output_prefix {params.output_prefix} -t {threads} --output_graphs >{log} 2>&1"
 
 
 rule index_updated_prg:
