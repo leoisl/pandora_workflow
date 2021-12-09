@@ -124,6 +124,7 @@ rule make_prg_from_msa:
 rule index_original_prg:
     input:
         prg = rules.make_prg_from_msa.output.prg_file,
+        pandora_exec = rules.download_pandora.output.pandora_exec
     output:
         index = output_folder+"/prgs/ecoli_pangenome_PRG.prg.fa.k15.w14.idx",
         kmer_prgs = directory(output_folder+"/prgs/kmer_prgs")
@@ -142,6 +143,7 @@ rule pandora_discover:
         prg = rules.make_prg_from_msa.output.prg_file,
         index = rules.index_original_prg.output.index,
         reads_index = rules.create_read_index.output.read_index,
+        pandora_exec = rules.download_pandora.output.pandora_exec
     output:
         outdir=directory(output_folder + "/{technology}/{coverage}x/{sub_strategy}/pandora_discover_out")
     threads: 16
@@ -182,6 +184,7 @@ rule update_prg:
 rule index_updated_prg:
     input:
         prg = rules.update_prg.output.prg_file,
+        pandora_exec = rules.download_pandora.output.pandora_exec
     output:
         index = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.fa.k15.w14.idx",
         kmer_prgs = directory(output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs_updated/kmer_prgs")
@@ -200,6 +203,7 @@ rule compare_withdenovo:
         read_index=rules.create_read_index.output.read_index,
         prg=rules.index_updated_prg.input.prg,
         prg_index=rules.index_updated_prg.output.index,
+        pandora_exec = rules.download_pandora.output.pandora_exec
     output:
         vcf=    output_folder+"/{technology}/{coverage}x/{sub_strategy}/compare_withdenovo/pandora_multisample_genotyped.vcf",
         vcf_ref=output_folder+"/{technology}/{coverage}x/{sub_strategy}/compare_withdenovo/pandora_multisample.vcf_ref.fa",
@@ -230,6 +234,7 @@ rule compare_nodenovo:
         read_index=rules.create_read_index.output.read_index,
         prg=rules.index_original_prg.input.prg,
         prg_index=rules.index_original_prg.output.index,
+        pandora_exec = rules.download_pandora.output.pandora_exec
     output:
         vcf=    output_folder+"/{technology}/{coverage}x/{sub_strategy}/compare_nodenovo/pandora_multisample_genotyped.vcf",
         vcf_ref=output_folder+"/{technology}/{coverage}x/{sub_strategy}/compare_nodenovo/pandora_multisample.vcf_ref.fa",
