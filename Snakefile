@@ -47,7 +47,7 @@ subsampled_reads = pd.read_csv(subsampled_reads_dir)
 subsampled_reads = update_to_absolute_path(subsampled_reads, ["subsampled_reads_dir"])
 
 msas_dir = config["msas_dir"]
-pandora_URL = config["pandora_URL"]
+pandora_container = config["containers"]["pandora"]
 make_prg_container = config["containers"]["make_prg"]
 ########################################################################################################################
 ########################################################################################################################
@@ -79,25 +79,6 @@ output_files = list(set(output_files))
 rule all:
     input:
          output_files
-
-rule download_pandora:
-    output:
-        pandora_exec = output_folder + "/tools/pandora"
-    params:
-        outdir = lambda wildcards, output: str(Path(output.pandora_exec).parent),
-    threads: 1
-    resources:
-        mem_mb=200
-    log:
-        "logs/download_pandora.log"
-    shell:
-        """
-        (cd {params.outdir} && \
-        wget {pandora_URL} && \
-        mv pandora* pandora && \
-        chmod +x ./pandora) >{log} 2>&1
-        """
-
 
 rule create_read_index:
     input:
@@ -152,8 +133,9 @@ rule index_original_prg:
         mem_mb=lambda wildcards, attempt: attempt * 20000
     log:
         "logs/index_original_prg.log"
+    container: pandora_container
     shell:
-        "{input.pandora_exec} index -t {threads} {input.prg} >{log} 2>&1"
+        "pandora index -t {threads} {input.prg} >{log} 2>&1"
 
 
 rule pandora_discover:
@@ -171,8 +153,9 @@ rule pandora_discover:
         technology_param = lambda wildcards: get_technology_param(wildcards.technology)
     log:
         "logs/pandora_discover/{technology}/{coverage}x/{sub_strategy}/pandora_discover.log"
+    container: pandora_container
     shell:
-        "{input.pandora_exec} discover --outdir {output.outdir} -t {threads} --max-covg 100000 {params.technology_param} "
+        "pandora discover --outdir {output.outdir} -t {threads} --max-covg 100000 {params.technology_param} "
         "{input.prg} {input.reads_index} >{log} 2>&1"
 
 
@@ -210,8 +193,9 @@ rule index_updated_prg:
         mem_mb=lambda wildcards, attempt: attempt * 20000
     log:
         "logs/{technology}/{coverage}x/{sub_strategy}/index_updated_prg.log"
+    container: pandora_container
     shell:
-        "{input.pandora_exec} index -t {threads} {input.prg} >{log} 2>&1"
+        "pandora index -t {threads} {input.prg} >{log} 2>&1"
 
 
 rule compare_withdenovo:
@@ -231,9 +215,10 @@ rule compare_withdenovo:
         technology_param = lambda wildcards: get_technology_param(wildcards.technology)
     log:
         "logs/compare_withdenovo/{technology}/{coverage}x/{sub_strategy}/pandora_compare_withdenovo.log"
+    container: pandora_container
     shell:
         """
-            {input.pandora_exec} compare  \
+            pandora compare  \
             --outdir {params.outdir} \
             --genotype \
             --max-covg 100000 \
@@ -261,9 +246,10 @@ rule compare_nodenovo:
         technology_param = lambda wildcards: get_technology_param(wildcards.technology)
     log:
         "logs/compare_nodenovo/{technology}/{coverage}x/{sub_strategy}/pandora_compare_nodenovo.log"
+    container: pandora_container
     shell:
         """
-            {input.pandora_exec} compare  \
+            pandora compare  \
             --outdir {params.outdir} \
             --genotype \
             --max-covg 100000 \
