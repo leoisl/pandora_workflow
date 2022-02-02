@@ -13,6 +13,6 @@ samples: metadata/samples_pandora_paper_tag1.4way_old_basecall.csv
 subsampled_reads_dir: metadata/subsampled_reads_pandora_paper_tag1.4way_old_basecall.csv
 msas_dir: ../data/msas
 
-pandora_URL: "https://www.dropbox.com/s/julg58ffdc7rxxt/pandora?dl=1"
+pandora_URL: "https://www.dropbox.com/s/p39mug64bbxcmfk/pandora?dl=1"
 containers:
   make_prg: docker://leandroishilima/make_prg:1.0.0
