@@ -185,9 +185,9 @@ rule update_prg:
         prg_bin_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.bin.zip",
         prg_gfa_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.gfa.zip",
         prg_update_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.update_DS.zip",
-    threads: 32
+    threads: 16
     resources:
-        mem_mb = lambda wildcards, attempt: attempt * 20000
+        mem_mb = lambda wildcards, attempt: attempt * 40000
     params:
         output_prefix = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG"
     container: make_prg_container
