@@ -207,11 +207,11 @@ rule index_updated_prg:
         kmer_prgs = directory(output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs_updated/kmer_prgs")
     threads: 16
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 20000
+        mem_mb=lambda wildcards, attempt: attempt * 50000
     log:
         "logs/{technology}/{coverage}x/{sub_strategy}/index_updated_prg.log"
     shell:
-        "{input.pandora_exec} index -t {threads} {input.prg} >{log} 2>&1"
+        "{input.pandora_exec} index -t {threads} -m 30000 {input.prg} >{log} 2>&1"
 
 
 rule compare_withdenovo:
