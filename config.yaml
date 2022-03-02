@@ -14,6 +14,6 @@ samples: metadata/samples_small.csv
 subsampled_reads_dir: metadata/subsampled_reads_small.csv
 msas_dir: sample_data/msas
 
-pandora_URL: "https://www.dropbox.com/s/r5osl8sqno7o8q1/pandora-linux-precompiled-glibc-v2?dl=1"
+pandora_URL: "https://www.dropbox.com/s/sjmgj3a1dkhj2ik/pandora-linux-precompiled-glibc?dl=1"
 containers:
-  make_prg: docker://leandroishilima/make_prg:1.0.0
+  make_prg: docker://leandroishilima/make_prg:1.0.0_pre_release
