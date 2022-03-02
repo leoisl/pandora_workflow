@@ -137,7 +137,7 @@ rule make_prg_from_msa:
     log:
         "logs/make_prg_from_msa.log"
     shell:
-        "make_prg from_msa --input {input.msas_dir} --output_prefix {params.output_prefix} -t {threads} >{log} 2>&1"
+        "make_prg from_msa --input {input.msas_dir} --output-prefix {params.output_prefix} -t {threads} >{log} 2>&1"
 
 
 rule index_original_prg:
@@ -194,8 +194,8 @@ rule update_prg:
     log:
         "logs/{technology}/{coverage}x/{sub_strategy}/update_prg.log"
     shell:
-        "make_prg update --update_DS {input.update_DS} --denovo_paths {input.pandora_discover_out}/denovo_paths.txt "
-        "--output_prefix {params.output_prefix} -t {threads} >{log} 2>&1"
+        "make_prg update --update-DS {input.update_DS} --denovo-paths {input.pandora_discover_out}/denovo_paths.txt "
+        "--output-prefix {params.output_prefix} -t {threads} >{log} 2>&1"
 
 
 rule index_updated_prg:
@@ -211,7 +211,7 @@ rule index_updated_prg:
     log:
         "logs/{technology}/{coverage}x/{sub_strategy}/index_updated_prg.log"
     shell:
-        "{input.pandora_exec} index -t {threads} -m 30000 {input.prg} >{log} 2>&1"
+        "{input.pandora_exec} index -t {threads} {input.prg} >{log} 2>&1"
 
 
 rule compare_withdenovo:
