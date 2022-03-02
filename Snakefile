@@ -166,7 +166,7 @@ rule pandora_discover:
         outdir=directory(output_folder + "/{technology}/{coverage}x/{sub_strategy}/pandora_discover_out")
     threads: 16
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 20000,
+        mem_mb=lambda wildcards, attempt: attempt * 20000
     params:
         technology_param = lambda wildcards: get_technology_param(wildcards.technology)
     log:
@@ -187,7 +187,7 @@ rule update_prg:
         prg_update_file = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.update_DS.zip",
     threads: 16
     resources:
-        mem_mb = lambda wildcards, attempt: attempt * 40000
+        mem_mb = lambda wildcards, attempt: attempt * 20000
     params:
         output_prefix = output_folder+ "/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG"
     container: make_prg_container
@@ -207,7 +207,7 @@ rule index_updated_prg:
         kmer_prgs = directory(output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs_updated/kmer_prgs")
     threads: 16
     resources:
-        mem_mb=lambda wildcards, attempt: attempt * 50000
+        mem_mb=lambda wildcards, attempt: attempt * 20000
     log:
         "logs/{technology}/{coverage}x/{sub_strategy}/index_updated_prg.log"
     shell:
