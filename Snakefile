@@ -145,8 +145,7 @@ rule index_original_prg:
         prg = rules.make_prg_from_msa.output.prg_file,
         pandora_exec = rules.download_pandora.output.pandora_exec
     output:
-        index = output_folder+"/prgs/ecoli_pangenome_PRG.prg.fa.k15.w14.idx",
-        kmer_prgs = directory(output_folder+"/prgs/kmer_prgs")
+        index = output_folder+"/prgs/ecoli_pangenome_PRG.prg.fa.panidx.zip"
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 20000
@@ -172,8 +171,8 @@ rule pandora_discover:
     log:
         "logs/pandora_discover/{technology}/{coverage}x/{sub_strategy}/pandora_discover.log"
     shell:
-        "{input.pandora_exec} discover --outdir {output.outdir} -t {threads} --max-covg 100000 {params.technology_param} "
-        "{input.prg} {input.reads_index} >{log} 2>&1"
+        "{input.pandora_exec} discover --outdir {output.outdir} -t {threads} --max-covg 100000 "
+        "{params.technology_param} {input.index} {input.reads_index} >{log} 2>&1"
 
 
 rule update_prg:
@@ -203,8 +202,7 @@ rule index_updated_prg:
         prg = rules.update_prg.output.prg_file,
         pandora_exec = rules.download_pandora.output.pandora_exec
     output:
-        index = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.fa.k15.w14.idx",
-        kmer_prgs = directory(output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs_updated/kmer_prgs")
+        index = output_folder+"/{technology}/{coverage}x/{sub_strategy}/prgs_updated/ecoli_pangenome_PRG.prg.fa.panidx.zip"
     threads: 16
     resources:
         mem_mb=lambda wildcards, attempt: attempt * 20000
@@ -239,7 +237,8 @@ rule compare_withdenovo:
             --max-covg 100000 \
             -t {threads} \
             {params.technology_param} \
-             {input.prg} \
+            --debugging-files \
+             {input.prg_index} \
              {input.read_index} > {log} 2>&1
         """
 
@@ -269,6 +268,7 @@ rule compare_nodenovo:
             --max-covg 100000 \
             -t {threads} \
             {params.technology_param} \
-             {input.prg} \
+            --debugging-files \
+             {input.prg_index} \
              {input.read_index} > {log} 2>&1
         """
