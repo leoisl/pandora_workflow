@@ -14,6 +14,6 @@ samples: metadata/samples_small.csv
 subsampled_reads_dir: metadata/subsampled_reads_small.csv
 msas_dir: sample_data/msas
 
-pandora_URL: "https://www.dropbox.com/s/d9mmdjmr4tbdgye/pandora_b19d26?dl=1"
+pandora_URL: "https://www.dropbox.com/s/psqb303s0osemxh/pandora_b19d26_release?dl=1"
 containers:
   make_prg: docker://quay.io/biocontainers/make_prg:0.4.0--pyhdfd78af_0
