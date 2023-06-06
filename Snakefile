@@ -237,7 +237,6 @@ rule compare_withdenovo:
             --max-covg 100000 \
             -t {threads} \
             {params.technology_param} \
-            --debugging-files \
              {input.prg_index} \
              {input.read_index} > {log} 2>&1
         """
@@ -268,7 +267,6 @@ rule compare_nodenovo:
             --max-covg 100000 \
             -t {threads} \
             {params.technology_param} \
-            --debugging-files \
              {input.prg_index} \
              {input.read_index} > {log} 2>&1
         """
