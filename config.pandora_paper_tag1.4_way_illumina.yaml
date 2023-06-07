@@ -15,4 +15,4 @@ msas_dir: ../data/msas
 
 pandora_URL: "https://www.dropbox.com/s/psqb303s0osemxh/pandora_b19d26_release?dl=1"
 containers:
-  make_prg: docker://quay.io/biocontainers/make_prg:0.4.0--pyhdfd78af_0
+  make_prg: docker://quay.io/iqballab/make_prg:not_erroring_out_on_non_acgt_variants
